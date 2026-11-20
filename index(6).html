@@ -1,0 +1,933 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>夢境群島 Dream Islands｜月瀑星夜・寬敞商場修正版</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#10132f;font-family:system-ui,"Noto Sans TC",sans-serif;touch-action:none}
+#game{position:fixed;inset:0}canvas{display:block}
+#title{position:fixed;top:14px;left:14px;color:#fff;text-shadow:0 2px 12px #19204c;font-weight:850;font-size:18px;letter-spacing:1px;pointer-events:none}
+#hint{position:fixed;top:43px;left:15px;color:#e7e5ff;text-shadow:0 2px 8px #19204c;font-size:12px;pointer-events:none}
+#joystick{position:fixed;left:22px;bottom:25px;width:116px;height:116px;border-radius:50%;background:#ffffff20;border:2px solid #ffffff65;touch-action:none}
+#stick{position:absolute;left:33px;top:33px;width:46px;height:46px;border-radius:50%;background:#fff9;border:2px solid white;box-shadow:0 3px 12px #477b8066}
+#jump{position:fixed;right:25px;bottom:36px;width:68px;height:68px;border-radius:50%;border:2px solid #fff;background:#ffffff35;color:#fff;font-weight:800;font-size:15px}
+#vehicle{position:fixed;right:20px;top:108px;border:1px solid #fff;border-radius:22px;padding:10px 14px;background:#68a9bd99;color:#fff;font-weight:800}
+#gas{position:fixed;right:25px;bottom:120px;width:70px;height:70px;border-radius:50%;border:2px solid #fff;background:#4cbd9c99;color:#fff;font-weight:800;display:none;touch-action:none}
+#brake{position:fixed;right:108px;bottom:36px;width:62px;height:62px;border-radius:50%;border:2px solid #fff;background:#d58c9c99;color:#fff;font-weight:800;display:none;touch-action:none}
+#home{position:fixed;right:22px;top:16px;border:1px solid #fff9;border-radius:20px;padding:9px 13px;background:#ffffff30;color:#fff;font-weight:700}
+#zone{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);padding:7px 13px;border-radius:20px;background:#17183d88;color:white;text-shadow:0 1px 5px #345;font-size:12px;white-space:nowrap;pointer-events:none}
+#loading{position:fixed;inset:0;display:grid;place-items:center;background:linear-gradient(#17183d,#6575a7);color:#fff;font-size:20px;font-weight:800;z-index:5;text-shadow:0 2px 8px #456}
+#travel{position:fixed;right:22px;top:58px;border:1px solid #fff9;border-radius:20px;padding:9px 13px;background:#9b8cff66;color:#fff;font-weight:700}
+#musicBtn{position:fixed;left:14px;top:76px;border:1px solid #ffffff99;border-radius:20px;padding:8px 12px;background:#27365fbb;color:#fff;font-weight:700;font-size:12px}
+#musicFile{display:none}
+#ambienceBtn{position:fixed;left:14px;top:118px;border:1px solid #ffffff99;border-radius:20px;padding:8px 12px;background:#345a70bb;color:#fff;font-weight:700;font-size:12px}
+
+#economy{position:fixed;right:12px;top:154px;z-index:4;display:flex;flex-direction:column;gap:6px;align-items:flex-end;max-width:190px;color:#fff;font-size:12px;text-shadow:0 1px 5px #10132f}
+#wallet{padding:7px 10px;border-radius:14px;background:#14264dcc;border:1px solid #b9eaff88;font-weight:800}
+#economy button{border:1px solid #ffffffaa;border-radius:18px;padding:8px 11px;background:#263b70dd;color:#fff;font-weight:750;font-size:12px;box-shadow:0 2px 8px #0003;touch-action:manipulation}
+#economy button:disabled{opacity:.45}
+#cityBtn{border-color:#ffe0a0!important;background:linear-gradient(110deg,#7041a8dd,#b57a32dd)!important}
+#staminaBox{position:fixed;left:14px;top:158px;width:148px;padding:6px 8px;border-radius:12px;background:#17254dcc;color:#fff;font-size:11px;z-index:4}
+#staminaTrack{height:8px;background:#ffffff35;border-radius:9px;overflow:hidden;margin-top:4px}#staminaFill{height:100%;width:100%;background:linear-gradient(90deg,#8cffb2,#e8ff9a);border-radius:9px}
+#shopPanel{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(310px,88vw);max-height:75vh;overflow:auto;z-index:8;display:none;padding:14px;border:1px solid #ffe6ad;border-radius:18px;background:linear-gradient(150deg,#20264eee,#52345eee);color:white;box-shadow:0 10px 40px #0009}
+#shopPanel h3{margin:2px 0 8px;font-size:17px}#shopPanel p{font-size:12px;line-height:1.5;margin:6px 0 10px}#shopPanel button{display:block;width:100%;margin:7px 0;padding:9px;border:1px solid #ffffff70;border-radius:12px;background:#ffffff20;color:white;font-weight:750;text-align:left;touch-action:manipulation}#shopPanel button:disabled{opacity:.45}#shopClose{background:#8b567c!important;text-align:center!important}
+#npcBuy{position:fixed;left:50%;top:42%;transform:translate(-50%,-50%);display:none;z-index:7;border:2px solid #ffe6ad;border-radius:22px;padding:9px 15px;background:#7b4b9eee;color:#fff;font-weight:900;font-size:15px;box-shadow:0 4px 18px #0008;touch-action:manipulation}
+#furniturePanel{position:fixed;left:50%;bottom:112px;transform:translateX(-50%);display:none;z-index:8;width:min(330px,90vw);padding:10px;border:1px solid #ffe6ad;border-radius:15px;background:#20264eee;color:#fff;grid-template-columns:repeat(3,1fr);gap:6px}
+#furniturePanel button{border:1px solid #ffffff70;border-radius:10px;padding:8px 4px;background:#ffffff20;color:white;font-size:11px;font-weight:750}
+#buildHint{position:fixed;left:50%;top:155px;transform:translateX(-50%);padding:7px 12px;border-radius:14px;background:#17254ddd;color:white;font-size:12px;display:none;z-index:4;white-space:nowrap}
+@media(max-width:420px){#economy{top:151px;right:8px;gap:5px}#economy button{padding:7px 9px;font-size:11px}#wallet{padding:6px 8px}}
+</style>
+</head>
+<body>
+<div id="game"></div><div id="loading">月亮正在升起，星星正在點亮……</div>
+<div id="title">夢境群島</div><div id="hint">Dream Islands · 月瀑星夜</div>
+<button id="home">回到起點</button><button id="travel">前往新場景 ✦</button><button id="vehicle">🚗 上車</button>
+<div id="joystick"><div id="stick"></div></div><button id="jump">跳躍</button><button id="gas">前進</button><button id="brake">煞車</button>
+<div id="economy">
+ <div id="wallet">💎 水晶 0　🪙 金幣 0　🪵 木塊 0</div>
+ <button id="mineBtn">⛏️ 挖水晶</button>
+ <button id="sellBtn">💰 賣出水晶（1顆＝1元）</button>
+ <button id="buyBtn">🪵 買木塊（1元＝1塊）</button>
+ <button id="buildBtn">🏡 開始蓋房子</button>
+ <button id="cityBtn">🛍️ 解鎖林口三井 Outlet（20元）</button>
+</div>
+<div id="staminaBox">⚡ 體力 <span id="staminaText">100/100</span><div id="staminaTrack"><div id="staminaFill"></div></div></div>
+<button id="npcBuy">💄 店員購買</button>
+<div id="shopPanel"><h3 id="shopTitle">🛍️ 林口三井 Outlet 商店</h3><p id="shopIntro">靠近不同店員，購買不同種類的商品。</p>
+<div id="makeupStore" data-store-section><h4>🎨 彩妝專櫃</h4><div id="makeupColors" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px"></div><p id="makeupMessage">選擇喜歡的顏色，替小人畫上專屬妝容！</p></div>
+<div id="fashionStore" data-store-section style="display:none"><h4>👗 服飾專櫃</h4><p>這裡販售可收藏、可重複穿搭的服裝。</p><button data-outfit="rose">🌸 櫻花披風（5 鑽石）</button><button data-outfit="ocean">🌊 星海旅人（8 鑽石）</button><button data-outfit="gold">✨ 金色星辰（12 鑽石）</button></div>
+<div id="foodStore" data-store-section style="display:none"><h4>🍰 美食專櫃</h4><p>補充探索體力的點心。</p><button id="foodBtn">🍰 買月光蛋糕（3 金幣，恢復 45 體力）</button><button data-food="waffle">🧇 星糖鬆餅（4 金幣，恢復 55 體力）</button><button data-food="soda">🥤 藍莓氣泡飲（2 金幣，恢復 25 體力）</button><button data-food="icecream">🍦 雲朵冰淇淋（3 金幣，恢復 35 體力）</button><button data-food="sandwich">🥪 月光三明治（4 金幣，恢復 50 體力）</button></div>
+<div id="accessoryStore" data-store-section style="display:none"><h4>✨ 飾品專櫃</h4><p>購買星光飾品，讓角色更有特色。</p><button data-accessory="star">⭐ 星星髮飾（4 金幣）</button><button data-accessory="moon">🌙 月亮耳飾（5 金幣）</button><button data-accessory="butterfly">🦋 蝴蝶胸針（6 金幣）</button></div>
+<div id="shoesStore" data-store-section style="display:none"><h4>👟 鞋履專門店</h4><p>挑選適合夜間散步與探索的鞋子。</p><button data-special="sneakers">👟 星雲運動鞋（6 金幣）</button><button data-special="boots">🥾 月光短靴（8 金幣）</button><button data-special="sandals">🩴 夏夜涼鞋（5 金幣）</button></div>
+<div id="perfumeStore" data-store-section style="display:none"><h4>🪻 香氛專櫃</h4><p>收集不同氣味的香氛小瓶。</p><button data-special="lavender">🪻 月霧薰衣草（5 金幣）</button><button data-special="ocean">🌊 海風白茶（5 金幣）</button><button data-special="peach">🍑 蜜桃晚香（6 金幣）</button></div>
+<button id="shopClose">關閉商店</button></div>
+<div id="buildHint">建造模式：選家具後點擊地面放置，再按一次結束</div>
+<div id="furniturePanel"><button data-furniture="chair">🪑 木椅</button><button data-furniture="table">🪵 小桌</button><button data-furniture="sofa">🛋️ 沙發</button><button data-furniture="bed">🛏️ 床</button><button data-furniture="lamp">🏮 庭院燈</button><button data-furniture="plant">🪴 盆栽</button><button data-furniture="woodblock">🧱 木建材</button></div>
+<div id="zone">夢境草原・月光之境</div><button id="musicBtn">🎵 選擇音樂</button><button id="ambienceBtn">🌬️ 環境音：關</button><input id="musicFile" type="file" accept="audio/*">
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+const mount=document.querySelector('#game'),scene=new THREE.Scene();
+scene.background=new THREE.Color(0x171b43);
+scene.fog=new THREE.FogExp2(0x30365f,.00072);
+const camera=new THREE.PerspectiveCamera(62,innerWidth/innerHeight,.1,2000);
+const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.setSize(innerWidth,innerHeight);
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;
+mount.appendChild(renderer.domElement);
+scene.add(new THREE.HemisphereLight(0xabbcff,0x43536a,1.7));
+const moonLight=new THREE.DirectionalLight(0xc7d7ff,2.0);moonLight.position.set(-170,240,-120);moonLight.castShadow=true;
+moonLight.shadow.mapSize.set(1024,1024);moonLight.shadow.camera.left=-240;moonLight.shadow.camera.right=240;moonLight.shadow.camera.top=240;moonLight.shadow.camera.bottom=-240;scene.add(moonLight);
+const fill=new THREE.PointLight(0x9bbaff,1.2,260);fill.position.set(-120,75,-100);scene.add(fill);
+const mat=(c,r=1)=>new THREE.MeshStandardMaterial({color:c,roughness:r});
+const grassMat=mat(0x6e9e78),rockMats=[mat(0x68758d),mat(0x7d879b),mat(0x53647a)],woodMat=mat(0x604a51);
+const leafMats=[mat(0x376d67),mat(0x477e72),mat(0x5b8b78),mat(0x718f7d)];
+const flowerMats=[mat(0xffe8ae),mat(0xf3b6d1),mat(0xbfc6ff),mat(0xffffff)];
+const rand=(a,b)=>a+Math.random()*(b-a);
+const blockers=[],fallingTrees=[],treeDebris=[],treeRespawns=[];
+function block(x,z,r){blockers.push({x,z,r});}
+function heightAt(x,z){
+ const base=4+Math.sin(x*.021+Math.cos(z*.017))*1.8+Math.sin(z*.037-x*.013)*1.1+Math.cos((x+z)*.012)*2.3+Math.sin(x*.008)*2+Math.max(0,1-Math.abs(x-170)/150)*Math.max(0,1-Math.abs(z+115)/190)*28;
+ // A broad, gently levelled natural basin lets the harbor water meet the shore.
+ const d=Math.hypot(x-275,z+235),blend=1-THREE.MathUtils.smoothstep(d,43,76);
+ const harborLevel=base*.25+3.0;
+ return THREE.MathUtils.lerp(base,harborLevel,blend);
+}
+const cityX=510,cityZ=0,cityTop=6;
+const mallCenterX=cityX-8,mallCenterZ=55,mallFrontZ=mallCenterZ+38;
+function groundAt(x,z){
+ if(Math.hypot(x-cityX,z-cityZ)<112){
+  // Two broad escalator/ramp lanes connect the entrance level to the upper gallery.
+  for(const rx of [mallCenterX-23,mallCenterX+23]){
+   if(Math.abs(x-rx)<5.8 && z>=mallCenterZ-10 && z<=mallFrontZ-1){
+    const t=THREE.MathUtils.clamp((mallFrontZ-1-z)/(mallFrontZ-1-(mallCenterZ-10)),0,1);
+    return cityTop+12*t;
+   }
+  }
+  const inside=Math.abs(x-mallCenterX)<46 && z>mallCenterZ-37 && z<mallCenterZ+37;
+  if(inside){
+   // Ground-floor corridors stay level. Upper galleries are visual balconies only;
+   // players reach the upper level only by using the two continuous ramp lanes above.
+  }
+  return cityTop;
+ }
+ return heightAt(x,z);
+}
+function addMesh(geo,material,x,y,z,sx=1,sy=1,sz=1){const m=new THREE.Mesh(geo,material);m.position.set(x,y,z);m.scale.set(sx,sy,sz);m.castShadow=true;m.receiveShadow=true;scene.add(m);return m;}
+
+// Rich midnight sky: stars, Milky Way dust, moon and halo
+const starPositions=[],starColors=[];
+for(let i=0;i<2600;i++){
+ const u=Math.random()*Math.PI*2,v=Math.acos(rand(-1,1)),r=1250;
+ const x=r*Math.sin(v)*Math.cos(u),y=Math.abs(r*Math.cos(v)),z=r*Math.sin(v)*Math.sin(u);
+ starPositions.push(x,y,z);
+ const c=new THREE.Color().setHSL(rand(.53,.72),rand(.25,.7),rand(.65,1));starColors.push(c.r,c.g,c.b);
+}
+const starGeo=new THREE.BufferGeometry();starGeo.setAttribute('position',new THREE.Float32BufferAttribute(starPositions,3));starGeo.setAttribute('color',new THREE.Float32BufferAttribute(starColors,3));
+const stars=new THREE.Points(starGeo,new THREE.PointsMaterial({size:2.3,vertexColors:true,transparent:true,opacity:.95,sizeAttenuation:false}));scene.add(stars);
+// Extra distant star clusters add depth to the night sky.
+for(let layer=0;layer<3;layer++){const pts=[];for(let i=0;i<420;i++){const a=rand(0,Math.PI*2),r=rand(380,1050);pts.push(Math.cos(a)*r,rand(100,650),Math.sin(a)*r);}const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));scene.add(new THREE.Points(g,new THREE.PointsMaterial({color:layer===1?0xb8caff:0xe5dcff,size:layer===1?1.6:1.1,transparent:true,opacity:.48,sizeAttenuation:false})));}
+// Milky-way ribbon of tiny stars
+const dustPos=[];
+for(let i=0;i<1900;i++){const t=rand(-1,1),a=rand(-1,1);dustPos.push(t*650,210+a*48+Math.sin(t*5)*32,-430+t*170);}
+const dustGeo=new THREE.BufferGeometry();dustGeo.setAttribute('position',new THREE.Float32BufferAttribute(dustPos,3));
+scene.add(new THREE.Points(dustGeo,new THREE.PointsMaterial({color:0xc7cfff,size:2.2,transparent:true,opacity:.7,sizeAttenuation:false})));
+const moon=new THREE.Mesh(new THREE.SphereGeometry(31,48,40),new THREE.MeshStandardMaterial({color:0xfff0d2,emissive:0xffdca0,emissiveIntensity:.55,roughness:1}));
+moon.position.set(-185,205,-470);scene.add(moon);
+const halo=new THREE.Mesh(new THREE.SphereGeometry(43,32,24),new THREE.MeshBasicMaterial({color:0xb9caff,transparent:true,opacity:.11,side:THREE.BackSide}));halo.position.copy(moon.position);scene.add(halo);
+const moonGlow=new THREE.PointLight(0xbacaff,2.4,520);moonGlow.position.copy(moon.position);scene.add(moonGlow);
+// Soft luminous cloud banks
+const cloudMat=new THREE.MeshStandardMaterial({color:0x8d9ac9,transparent:true,opacity:.33,roughness:1});
+for(let i=0;i<36;i++){const g=new THREE.Group(),x=rand(-550,550),z=rand(-550,550),y=rand(90,170);for(let j=0;j<6;j++){const p=new THREE.Mesh(new THREE.SphereGeometry(rand(8,18),10,8),cloudMat);p.position.set(rand(-17,17),rand(-4,4),rand(-10,10));p.scale.y=.55;g.add(p);}g.position.set(x,y,z);scene.add(g);}
+
+// Rolling natural terrain with vertex color variation
+const size=760,seg=230,geo=new THREE.PlaneGeometry(size,size,seg,seg);geo.rotateX(-Math.PI/2);
+const pos=geo.attributes.position,colors=[];
+const cA=new THREE.Color(0x789f7c),cB=new THREE.Color(0x547e75),cC=new THREE.Color(0x9aa18b),cD=new THREE.Color(0x687d91);
+for(let i=0;i<pos.count;i++){const x=pos.getX(i),z=pos.getZ(i),h=heightAt(x,z);pos.setY(i,h);let c=cA.clone();const n=Math.sin(x*.035)*Math.cos(z*.03);if(n>.35)c.lerp(cB,.3);if(h>23)c.lerp(cC,.4);if(n<-.7)c.lerp(cD,.16);colors.push(c.r,c.g,c.b);}
+geo.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));geo.computeVertexNormals();
+const terrain=new THREE.Mesh(geo,new THREE.MeshStandardMaterial({vertexColors:true,roughness:1}));terrain.receiveShadow=true;scene.add(terrain);
+
+
+// Restored green, breakable trees across the main island (kept clear of the Outlet island).
+for(let i=0;i<420;i++){
+ const x=rand(-340,340),z=rand(-340,340);
+ if(Math.hypot(x,z)<32 || Math.hypot(x-510,z)<142) continue;
+ const y=heightAt(x,z),sc=rand(.72,1.3),tree=new THREE.Group();
+ tree.position.set(x,y,z);scene.add(tree);
+ const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.32*sc,.65*sc,6*sc,7),woodMat);
+ trunk.position.y=3*sc;trunk.castShadow=true;tree.add(trunk);
+ const crown=new THREE.Mesh(new THREE.SphereGeometry(4.2*sc,10,9),leafMats[i%leafMats.length]);
+ crown.position.y=8*sc;crown.scale.set(1,1.15,1);crown.castShadow=true;tree.add(crown);
+ const crown2=new THREE.Mesh(new THREE.SphereGeometry(3.2*sc,9,8),leafMats[(i+1)%leafMats.length]);
+ crown2.position.set(rand(-1.6,1.6)*sc,10.2*sc,rand(-1.5,1.5)*sc);crown2.scale.set(.95,.9,.95);crown2.castShadow=true;tree.add(crown2);
+ for(let b=0;b<2;b++){
+  const branch=new THREE.Mesh(new THREE.CylinderGeometry(.12*sc,.2*sc,2.6*sc,5),woodMat);
+  branch.position.set((b?1:-1)*1.15*sc,5.4*sc,0);branch.rotation.z=(b?-.7:.7);branch.castShadow=true;tree.add(branch);
+ }
+ blockers.push({x,z,r:2.8*sc,kind:'tree',object:tree,broken:false});
+}
+function breakTree(b,dx,dz){
+ if(!b||b.broken)return;
+ b.broken=true;
+ const tree=b.object,idx=blockers.indexOf(b);if(idx>=0)blockers.splice(idx,1);
+ const len=Math.hypot(dx,dz)||1;
+ fallingTrees.push({tree,age:0,fromX:tree.rotation.x,fromZ:tree.rotation.z,toX:(dz/len)*1.12,toZ:-(dx/len)*1.12});
+ treeRespawns.push({tree,x:b.x,z:b.z,r:b.r,kind:'tree',timer:55});
+ for(let i=0;i<15;i++){
+  const leaf=i%3!==0;
+  const mesh=new THREE.Mesh(leaf?new THREE.SphereGeometry(.28,6,5):new THREE.BoxGeometry(.28,.7,.22),leaf?leafMats[i%leafMats.length]:woodMat);
+  mesh.position.set(b.x+rand(-1,1),heightAt(b.x,b.z)+rand(2,8),b.z+rand(-1,1));mesh.castShadow=true;scene.add(mesh);
+  treeDebris.push({mesh,vx:rand(-5,5),vy:rand(2,8),vz:rand(-5,5),life:1.8});
+ }
+ if(typeof ambienceContext!=='undefined'&&ambienceContext&&ambienceOn){
+  const t=ambienceContext.currentTime,o=ambienceContext.createOscillator(),g=ambienceContext.createGain();
+  o.type='triangle';o.frequency.setValueAtTime(115,t);o.frequency.exponentialRampToValueAtTime(48,t+.22);
+  g.gain.setValueAtTime(.18,t);g.gain.exponentialRampToValueAtTime(.001,t+.28);
+  o.connect(g);g.connect(ambienceMaster);o.start(t);o.stop(t+.3);
+ }
+}
+
+// The unlocked second island: rebuilt as a warm, detailed Linkou-style outlet town.
+const cityIsland=new THREE.Mesh(new THREE.CylinderGeometry(112,126,18,96),new THREE.MeshStandardMaterial({color:0x8a8278,roughness:.96}));cityIsland.position.set(cityX,-3,cityZ);cityIsland.receiveShadow=true;cityIsland.castShadow=true;scene.add(cityIsland);
+const cityTopMat=new THREE.MeshStandardMaterial({color:0xb8aa98,roughness:.92});
+addMesh(new THREE.CylinderGeometry(108,108,1.2,96),cityTopMat,cityX,cityTop-.65,cityZ);
+// Wide stone pedestrian bridge and landscaped entrance.
+const bridgeMat=new THREE.MeshStandardMaterial({color:0xb7a995,roughness:.85});
+addMesh(new THREE.BoxGeometry(48,2.2,13),bridgeMat,cityX-137,cityTop-1,cityZ);
+const goldMat=new THREE.MeshStandardMaterial({color:0xc7a879,metalness:.12,roughness:.62});
+const neonPink=new THREE.MeshStandardMaterial({color:0xd99a9c,roughness:.58});
+const neonBlue=new THREE.MeshStandardMaterial({color:0x8db8c0,roughness:.42,metalness:.08});
+const cityGlass=new THREE.MeshStandardMaterial({color:0x8bb5bd,metalness:.18,roughness:.2,emissive:0x34515a,emissiveIntensity:.22});
+// Open-air central court with a low stone fountain, trees and seating.
+const plaza=addMesh(new THREE.CylinderGeometry(34,34,.45,64),new THREE.MeshStandardMaterial({color:0xd2c5b3,roughness:.86}),cityX,cityTop+.05,cityZ);
+const fountain=addMesh(new THREE.CylinderGeometry(8,10,1.2,48),new THREE.MeshStandardMaterial({color:0xc7b49a,roughness:.55}),cityX,cityTop+.75,cityZ);
+const fountainWater=addMesh(new THREE.CylinderGeometry(7.6,7.6,.22,48),new THREE.MeshPhysicalMaterial({color:0x80c9d2,transparent:true,opacity:.82,roughness:.16,clearcoat:1}),cityX,cityTop+1.48,cityZ);
+const fountainGlow=new THREE.PointLight(0xffd9ad,1.0,58);fountainGlow.position.set(cityX,cityTop+8,cityZ);scene.add(fountainGlow);
+block(cityX,cityZ,10);
+// Low-rise Mediterranean-inspired outlet facades instead of neon skyscrapers.
+const facadeMat=new THREE.MeshStandardMaterial({color:0xe5d7c5,roughness:.82});
+const trimMat=new THREE.MeshStandardMaterial({color:0xf1e8da,roughness:.72});
+const roofMat=new THREE.MeshStandardMaterial({color:0x88786c,roughness:.9});
+for(let side=0;side<2;side++){
+ const sx=cityX+(side?73:-73),sz=cityZ-7;
+ addMesh(new THREE.BoxGeometry(38,18,58),facadeMat,sx,cityTop+9,sz);
+ addMesh(new THREE.BoxGeometry(41,1.4,61),roofMat,sx,cityTop+18.3,sz);
+ addMesh(new THREE.BoxGeometry(40,1.1,60),trimMat,sx,cityTop+2.1,sz);
+ for(let floor=0;floor<2;floor++)for(let bay=0;bay<5;bay++){
+  const bx=sx-15+bay*7.5,by=cityTop+5+floor*7,bz=sz+29.25;
+  addMesh(new THREE.BoxGeometry(5.2,4.1,.28),cityGlass,bx,by,bz);
+  addMesh(new THREE.BoxGeometry(5.7,.42,.9),floor?neonBlue:neonPink,bx,by+2.25,bz+.45);
+  const glow=new THREE.PointLight(0xffd7ad,.32,13);glow.position.set(bx,by,bz+2.2);scene.add(glow);
+ }
+ block(sx,sz,21);
+ // Recessed entrance canopy and arched-looking portico details.
+ addMesh(new THREE.BoxGeometry(13,1,5),trimMat,sx,cityTop+13,sz+32);
+ for(let col=-1;col<=1;col++)addMesh(new THREE.CylinderGeometry(.38,.48,8,12),trimMat,sx+col*5,cityTop+4,sz+31);
+}
+// A low, glass-fronted central pavilion and garden seating.
+const pavilion=addMesh(new THREE.BoxGeometry(48,10,22),facadeMat,cityX,cityTop+5,cityZ-68);
+addMesh(new THREE.BoxGeometry(50,1.2,24),roofMat,cityX,cityTop+10.5,cityZ-68);
+block(cityX,cityZ-68,25);
+for(let i=0;i<6;i++){const x=cityX-30+i*12;addMesh(new THREE.BoxGeometry(7,5,.3),cityGlass,x,cityTop+4,cityZ-56.8);}
+const cityHalo=new THREE.PointLight(0xffd8ad,1.2,150);cityHalo.position.set(cityX,cityTop+32,cityZ);scene.add(cityHalo);
+
+// Large Linkou Mitsui-inspired department store: one connected, walk-in multi-storey mall.
+const mallX=mallCenterX,mallZ=mallCenterZ,front=mallFrontZ;
+const mallFloorMat=new THREE.MeshStandardMaterial({color:0xd8d2c8,roughness:.78});
+const mallWhite=new THREE.MeshStandardMaterial({color:0xf1eee7,roughness:.72});
+const mallStone=new THREE.MeshStandardMaterial({color:0xc8c4bd,roughness:.82});
+const mallGlass=new THREE.MeshPhysicalMaterial({color:0x83b5c4,metalness:.25,roughness:.16,transparent:true,opacity:.72,clearcoat:1});
+const mallDarkGlass=new THREE.MeshPhysicalMaterial({color:0x355c70,metalness:.3,roughness:.18,transparent:true,opacity:.86,clearcoat:1});
+const mallMetal=new THREE.MeshStandardMaterial({color:0x9d9b98,metalness:.72,roughness:.28});
+const mallWarm=new THREE.MeshStandardMaterial({color:0xe8bd82,emissive:0x7d4821,emissiveIntensity:.22,roughness:.55});
+const mallPlant=new THREE.MeshStandardMaterial({color:0x4c8068,roughness:1});
+const mallWood=new THREE.MeshStandardMaterial({color:0x92745b,roughness:.82});
+const mallFloor=addMesh(new THREE.BoxGeometry(94,.8,76),mallFloorMat,mallX,cityTop-.4,mallZ);
+// Open-air resort-mall massing: slim stone plinths, layered white fascia and a visible glass atrium.
+// The former solid boxes are deliberately replaced with open structure so the interior stays visible.
+addMesh(new THREE.BoxGeometry(96,.9,78),mallStone,mallX,cityTop-.45,mallZ);
+// Horizontal fascia is built only around the perimeter, leaving the atrium volume open.
+addMesh(new THREE.BoxGeometry(92,.75,1.1),mallWhite,mallX,cityTop+7.1,mallZ+36.4);
+addMesh(new THREE.BoxGeometry(92,.75,1.1),mallWhite,mallX,cityTop+7.1,mallZ-36.4);
+addMesh(new THREE.BoxGeometry(1.1,.75,72),mallWhite,mallX+45.4,cityTop+7.1,mallZ);
+addMesh(new THREE.BoxGeometry(1.1,.75,72),mallWhite,mallX-45.4,cityTop+7.1,mallZ);
+// Upper-level white fascia bands sit above the storefront glazing rather than filling the building.
+addMesh(new THREE.BoxGeometry(92,1.15,1.1),mallWhite,mallX,cityTop+20.3,mallZ+36.4);
+addMesh(new THREE.BoxGeometry(92,1.15,1.1),mallWhite,mallX,cityTop+20.3,mallZ-36.4);
+addMesh(new THREE.BoxGeometry(1.1,1.15,72),mallWhite,mallX+45.4,cityTop+20.3,mallZ);
+addMesh(new THREE.BoxGeometry(1.1,1.15,72),mallWhite,mallX-45.4,cityTop+20.3,mallZ);
+// Front facade is split around a tall, open entrance.
+addMesh(new THREE.BoxGeometry(31,17,1.4),mallWhite,mallX-31.5,cityTop+13,front);
+addMesh(new THREE.BoxGeometry(31,17,1.4),mallWhite,mallX+31.5,cityTop+13,front);
+addMesh(new THREE.BoxGeometry(30,3,1.4),mallWhite,mallX,cityTop+22,front);
+for(let side of [-1,1]){
+ // Two-storey glass curtain wall, divided by slender white piers like an open-air outlet arcade.
+ for(let z=mallZ-33;z<=mallZ+33;z+=11){
+  addMesh(new THREE.BoxGeometry(.34,13,10.2),mallGlass,mallX+side*46,cityTop+11.2,z+5.5);
+  addMesh(new THREE.BoxGeometry(.7,19,1.0),mallWhite,mallX+side*46.2,cityTop+12,z);
+  addMesh(new THREE.BoxGeometry(.2,13,.18),mallMetal,mallX+side*45.72,cityTop+11.2,z+5.5);
+ }
+ addMesh(new THREE.BoxGeometry(1.2,1.1,76),mallStone,mallX+side*46,cityTop+6.9,mallZ);
+ addMesh(new THREE.BoxGeometry(1.2,1.0,76),mallWhite,mallX+side*46,cityTop+20.3,mallZ);
+}
+// Broad glazed shopfront wings and a projecting resort-style entrance canopy.
+for(let side of [-1,1]){
+ for(let i=0;i<3;i++){
+  const bx=mallX+side*(22+i*9.2);
+  addMesh(new THREE.BoxGeometry(8.4,8.8,.32),mallGlass,bx,cityTop+10.7,front-.82);
+  addMesh(new THREE.BoxGeometry(.18,8.8,.22),mallMetal,bx,cityTop+10.7,front-1.02);
+ }
+ addMesh(new THREE.BoxGeometry(28,.75,5.5),mallStone,mallX+side*29,cityTop+7.3,front-2.5);
+ addMesh(new THREE.BoxGeometry(28,.3,5.5),mallWhite,mallX+side*29,cityTop+7.8,front-2.5);
+}
+// Signature high arched entrance portal with layered trim and tall glazed doors.
+const archOuter=addMesh(new THREE.TorusGeometry(15,1.5,12,64,Math.PI),mallWhite,mallX,cityTop+10,front-.6);
+archOuter.rotation.z=Math.PI;
+const archInner=addMesh(new THREE.TorusGeometry(12.5,.48,10,64,Math.PI),mallMetal,mallX,cityTop+10,front-1.2);
+archInner.rotation.z=Math.PI;
+addMesh(new THREE.BoxGeometry(7.2,12,.5),mallDarkGlass,mallX-7.7,cityTop+7,front-1.6);
+addMesh(new THREE.BoxGeometry(7.2,12,.5),mallDarkGlass,mallX+7.7,cityTop+7,front-1.6);
+for(let dx of [-10.8,-8.8,-6.6,6.6,8.8,10.8]) addMesh(new THREE.BoxGeometry(.16,11,.25),mallMetal,mallX+dx,cityTop+7,front-1.25);
+addMesh(new THREE.BoxGeometry(25,1.2,4),mallStone,mallX,cityTop+.6,front-2.3);
+for(let side of [-1,1]){
+ const col=addMesh(new THREE.CylinderGeometry(1.25,1.55,17,20),mallWhite,mallX+side*16,cityTop+9,front-2.2);
+ addMesh(new THREE.CylinderGeometry(1.8,1.8,.8,20),mallStone,mallX+side*16,cityTop+17.7,front-2.2);
+ addMesh(new THREE.CylinderGeometry(1.8,1.8,.8,20),mallStone,mallX+side*16,cityTop+.7,front-2.2);
+}
+// Main interior floor and a true open-to-below central atrium.
+addMesh(new THREE.BoxGeometry(90,.7,72),mallFloorMat,mallX,cityTop+.1,mallZ);
+// Four separated second-floor gallery wings leave a true open central atrium.
+addMesh(new THREE.BoxGeometry(90,.65,18),mallFloorMat,mallX,cityTop+12,mallZ-27);
+addMesh(new THREE.BoxGeometry(90,.65,18),mallFloorMat,mallX,cityTop+12,mallZ+27);
+addMesh(new THREE.BoxGeometry(18,.65,36),mallFloorMat,mallX-36,cityTop+12,mallZ);
+addMesh(new THREE.BoxGeometry(18,.65,36),mallFloorMat,mallX+36,cityTop+12,mallZ);
+for(const z of [mallZ-17,mallZ+17]){
+ addMesh(new THREE.BoxGeometry(90,.55,2.8),mallFloorMat,mallX,cityTop+12,z);
+ addMesh(new THREE.BoxGeometry(90,.35,.3),mallMetal,mallX,cityTop+13.2,z);
+ for(let x=mallX-43;x<=mallX+43;x+=4) addMesh(new THREE.BoxGeometry(.12,1.1,.12),mallMetal,x,cityTop+12.65,z);
+}
+for(const x of [mallX-17,mallX+17]){
+ addMesh(new THREE.BoxGeometry(2.8,.55,72),mallFloorMat,x,cityTop+12,mallZ);
+ addMesh(new THREE.BoxGeometry(.3,.35,72),mallMetal,x,cityTop+13.2,mallZ);
+ for(let z=mallZ-33;z<=mallZ+33;z+=4) addMesh(new THREE.BoxGeometry(.12,1.1,.12),mallMetal,x,cityTop+12.65,z);
+}
+// Open upper-level balconies and glass balustrades.
+for(let side of [-1,1]){
+ addMesh(new THREE.BoxGeometry(.3,1.25,36),mallGlass,mallX+side*18,cityTop+12.8,mallZ);
+}
+// Escalators: visible ribbed inclined belts and handrails, with matching walkable sloped lanes.
+for(let side of [-1,1]){
+ const ex=mallX+side*23,lowZ=front-2,highZ=mallZ-10,run=lowZ-highZ,angle=Math.atan2(12,run),len=Math.hypot(run,12);
+ const belt=addMesh(new THREE.BoxGeometry(5.6,.55,len),mallDarkGlass,ex,cityTop+6, (lowZ+highZ)/2);
+ belt.rotation.x=angle;
+ for(let railSide of [-1,1]){
+  const rail=addMesh(new THREE.BoxGeometry(.22,1.05,len),mallMetal,ex+railSide*3,cityTop+6.65,(lowZ+highZ)/2);
+  rail.rotation.x=angle;
+  addMesh(new THREE.BoxGeometry(.3,.3,len),mallWood,ex+railSide*3,cityTop+7.25,(lowZ+highZ)/2).rotation.x=angle;
+ }
+ for(let step=0;step<24;step++){
+  const t=step/23,z=lowZ-run*t,y=cityTop+12*t;
+  const tread=addMesh(new THREE.BoxGeometry(5.2,.12,.42),mallMetal,ex,y,z);
+  tread.rotation.x=angle;
+ }
+}
+// Ground-floor shopfronts: real open corridors, counters, racks, signs and warm interior lighting.
+const storeColors=[0xc77fa3,0x7ca9bd,0xd2a66f,0x91aa83,0x9d8bc4,0xd18b75];
+for(let side of [-1,1]){
+ for(let i=0;i<4;i++){
+  const sx=mallX+side*34,sz=mallZ-25+i*16;
+  addMesh(new THREE.BoxGeometry(18,.25,13),mallWood,sx,cityTop+.35,sz);
+  addMesh(new THREE.BoxGeometry(5.6,6,.35),mallGlass,sx-5.7,cityTop+3.6,sz-6.5);
+  addMesh(new THREE.BoxGeometry(5.6,6,.35),mallGlass,sx+5.7,cityTop+3.6,sz-6.5);
+  addMesh(new THREE.BoxGeometry(17,.45,.8),mallWhite,sx,cityTop+6.7,sz-6.2);
+  addMesh(new THREE.BoxGeometry(12,.35,1),new THREE.MeshStandardMaterial({color:storeColors[(i+(side>0?2:0))%6],emissive:storeColors[(i+(side>0?2:0))%6],emissiveIntensity:.12}),sx,cityTop+6.1,sz-6.9);
+  addMesh(new THREE.BoxGeometry(5,1.2,2),mallWood,sx,cityTop+1.2,sz+1);
+  for(let r=0;r<3;r++) addMesh(new THREE.BoxGeometry(.7,2.2,.65),new THREE.MeshStandardMaterial({color:storeColors[(i+r)%6]}),sx-4+r*4,cityTop+2.1,sz+3);
+  const light=new THREE.PointLight(0xffd6a0,.65,16);light.position.set(sx,cityTop+5,sz+1);scene.add(light);
+ }
+}
+// Food court, seating and indoor trees around the atrium.
+for(let i=0;i<6;i++){
+ const x=mallX-12+i*4.8,z=mallZ+25;
+ addMesh(new THREE.CylinderGeometry(.18,.22,2.5,8),mallWood,x,cityTop+1.6,z);
+ addMesh(new THREE.CylinderGeometry(1.5,1.5,.28,16),mallWood,x,cityTop+2.9,z);
+ for(let j=0;j<3;j++) addMesh(new THREE.BoxGeometry(1.1,.6,1.1),mallStone,x+(j-1)*1.9,cityTop+.8,z+2);
+}
+for(let i=0;i<4;i++){
+ const x=mallX-39+i*26,z=mallZ-2;
+ addMesh(new THREE.CylinderGeometry(.35,.5,4,9),mallWood,x,cityTop+2,z);
+ addMesh(new THREE.SphereGeometry(2.5,12,10),mallPlant,x,cityTop+5,z);
+}
+// Upper level boutique storefronts and window bays.
+for(let side of [-1,1]) for(let i=0;i<3;i++){
+ const sx=mallX+side*33,sz=mallZ-23+i*22;
+ addMesh(new THREE.BoxGeometry(18,6,.5),mallGlass,sx,cityTop+16,sz-7);
+ addMesh(new THREE.BoxGeometry(17,.5,1.1),mallWarm,sx,cityTop+19,sz-6.5);
+ addMesh(new THREE.BoxGeometry(13,.4,4),mallWood,sx,cityTop+12.5,sz);
+}
+// Skylight roof framing leaves the atrium open to the night sky.
+for(let x=mallX-43;x<=mallX+43;x+=12){
+ addMesh(new THREE.BoxGeometry(.55,.65,68),mallMetal,x,cityTop+24,mallZ-1);
+}
+for(let z=mallZ-34;z<=mallZ+34;z+=12) addMesh(new THREE.BoxGeometry(88,.45,.55),mallMetal,mallX,cityTop+24,z);
+for(let side of [-1,1]){
+ addMesh(new THREE.BoxGeometry(5,1.2,76),mallWhite,mallX+side*45,cityTop+24.6,mallZ);
+}
+// Bright interior ceiling lights, pendant lights and signage.
+for(let x=mallX-32;x<=mallX+32;x+=16) for(let z=mallZ-25;z<=mallZ+25;z+=17){
+ const lamp=new THREE.PointLight(0xffdfb4,1.65,30);lamp.position.set(x,cityTop+21,z);scene.add(lamp);
+ addMesh(new THREE.SphereGeometry(.34,10,8),new THREE.MeshBasicMaterial({color:0xffe7bd}),x,cityTop+22,z);
+}
+const mallSignCanvas=document.createElement('canvas');mallSignCanvas.width=768;mallSignCanvas.height=180;
+const mallSignCtx=mallSignCanvas.getContext('2d');mallSignCtx.fillStyle='#f7f5ef';mallSignCtx.fillRect(0,0,768,180);
+mallSignCtx.fillStyle='#514b48';mallSignCtx.font='bold 66px sans-serif';mallSignCtx.textAlign='center';mallSignCtx.fillText('MITSUI OUTLET PARK',384,112);
+const mallSignTex=new THREE.CanvasTexture(mallSignCanvas);
+addMesh(new THREE.PlaneGeometry(34,8),new THREE.MeshBasicMaterial({map:mallSignTex}),mallX,cityTop+22,front-1.1);
+// Architectural collision boundaries; the centre entrance remains completely open.
+for(let x=mallX-43;x<=mallX+43;x+=8){
+ if(Math.abs(x-mallX)>12) block(x,front-1,4.2);
+}
+for(let z=mallZ-32;z<=mallZ+32;z+=8){block(mallX-46,z,4.2);block(mallX+46,z,4.2);}
+for(let x=mallX-42;x<=mallX+42;x+=8) block(x,mallZ-37,4.2);
+// Landscaped forecourt and wide entrance steps.
+addMesh(new THREE.BoxGeometry(46,.5,15),mallStone,mallX,cityTop-.1,front+8);
+for(let i=0;i<4;i++) addMesh(new THREE.BoxGeometry(38,.35,1.5),mallWhite,mallX,cityTop+.15+i*.28,front+13-i*1.5);
+for(let side of [-1,1]){
+ const planter=addMesh(new THREE.BoxGeometry(8,1.2,5),mallStone,mallX+side*29,cityTop+.6,front+8);
+ for(let j=0;j<4;j++) addMesh(new THREE.SphereGeometry(1.1,9,8),mallPlant,mallX+side*29-2.5+j*1.7,cityTop+2,front+8);
+}
+const mallHalo=new THREE.PointLight(0xffe2bd,2.0,100);mallHalo.position.set(mallX,cityTop+18,mallZ);scene.add(mallHalo);
+// Friendly cosmetics shopkeeper standing in the outlet pedestrian plaza.
+const clerk=new THREE.Group();
+const clerkBody=new THREE.Mesh(new THREE.CapsuleGeometry(.72,1.7,4,10),new THREE.MeshStandardMaterial({color:0xf0d7c5,roughness:.8}));clerkBody.position.y=1.55;clerk.add(clerkBody);
+const clerkHead=new THREE.Mesh(new THREE.SphereGeometry(.62,16,12),new THREE.MeshStandardMaterial({color:0xffdfc9,roughness:.85}));clerkHead.position.y=3.05;clerk.add(clerkHead);
+const clerkHair=new THREE.Mesh(new THREE.SphereGeometry(.67,16,10),new THREE.MeshStandardMaterial({color:0x49334a,roughness:1}));clerkHair.scale.set(1,1,.85);clerkHair.position.set(0,3.25,-.08);clerk.add(clerkHair);
+const clerkApron=new THREE.Mesh(new THREE.BoxGeometry(1.12,1.35,.16),new THREE.MeshStandardMaterial({color:0xc77da9,roughness:.7}));clerkApron.position.set(0,1.75,.57);clerk.add(clerkApron);
+clerk.position.set(mallX+8,cityTop, mallZ+5);scene.add(clerk);
+const clerkLamp=new THREE.PointLight(0xffc9e5,1.2,16);clerkLamp.position.set(mallX+8,cityTop+4.2,mallZ+5);scene.add(clerkLamp);
+// Several independent shopkeepers, each assigned to a different department.
+const shopkeepers=[{group:clerk,x:mallX+8,z:mallZ+5,type:'makeup',title:'🎨 星光彩妝專櫃',label:'💄 彩妝店員' }];
+function addShopkeeper(x,z,type,title,label,color){const g=clerk.clone(true);g.position.set(x,cityTop,z);g.traverse(o=>{if(o.isMesh&&o.material&&o.material.color&&o.geometry.type==='BoxGeometry')o.material=o.material.clone();});const apron=g.children.find(o=>o.geometry&&o.geometry.type==='BoxGeometry');if(apron&&apron.material.color)apron.material.color.setHex(color);scene.add(g);const l=new THREE.PointLight(color,1.0,13);l.position.set(x,cityTop+4.2,z);scene.add(l);shopkeepers.push({group:g,x,z,type,title,label});}
+addShopkeeper(mallX-25,mallZ+5,'fashion','👗 服飾精品專櫃','👗 服飾店員',0x83a9d9);
+addShopkeeper(mallX+27,mallZ+5,'food','🍰 美食甜點專櫃','🍰 美食店員',0xe6a76d);
+addShopkeeper(mallX-25,mallZ-20,'accessory','✨ 星光飾品專櫃','✨ 飾品店員',0xc69be8);
+addShopkeeper(mallX+27,mallZ-20,'perfume','🪻 香氛專櫃','🪻 香氛店員',0xe58eae);
+addShopkeeper(mallX-34,mallZ+27,'shoes','👟 鞋履專門店','👟 鞋店店員',0x8bb6a5);
+// Department display islands: each clerk has a decorated, recognizable counter and sign.
+function addDepartmentDisplay(x,z,color,title,kind){
+ const accent=new THREE.MeshStandardMaterial({color,roughness:.48,metalness:.12,emissive:color,emissiveIntensity:.08});
+ const cream=new THREE.MeshStandardMaterial({color:0xf4e7d5,roughness:.72});
+ addMesh(new THREE.BoxGeometry(9,.45,5.2),cream,x,cityTop+.45,z);
+ addMesh(new THREE.BoxGeometry(7.8,1.25,.32),accent,x,cityTop+1.25,z-2.25);
+ addMesh(new THREE.BoxGeometry(7.8,.18,4.6),accent,x,cityTop+1.05,z);
+ // Decorative display plinths and small product silhouettes, kept low and outside the walking lane.
+ for(let i=0;i<3;i++){
+  const px=x-2.6+i*2.6;
+  addMesh(new THREE.BoxGeometry(1.25,.75,1.15),cream,px,cityTop+1.7,z+.35);
+  if(kind==='shoes'){
+   const shoe=addMesh(new THREE.SphereGeometry(.48,12,8),accent,px,cityTop+2.2,z+.35,1.35,.42,.72);shoe.rotation.y=-.25;
+  }else if(kind==='perfume'){
+   addMesh(new THREE.CylinderGeometry(.28,.34,.8,12),accent,px,cityTop+2.45,z+.35);
+   addMesh(new THREE.CylinderGeometry(.16,.16,.22,8),mallMetal,px,cityTop+2.95,z+.35);
+  }else if(kind==='food'){
+   addMesh(new THREE.SphereGeometry(.48,12,8),accent,px,cityTop+2.35,z+.35,1,.72,1);
+   addMesh(new THREE.TorusGeometry(.28,.07,6,14),mallWarm,px,cityTop+2.68,z+.35);
+  }else if(kind==='accessory'){
+   addMesh(new THREE.TorusGeometry(.38,.11,8,18),accent,px,cityTop+2.45,z+.35);
+   addMesh(new THREE.SphereGeometry(.18,10,8),mallWarm,px,cityTop+2.45,z+.35);
+  }else{
+   addMesh(new THREE.SphereGeometry(.42,12,8),accent,px,cityTop+2.4,z+.35);
+   addMesh(new THREE.TorusGeometry(.3,.08,6,14),mallWarm,px,cityTop+2.75,z+.35);
+  }
+ }
+ const canvas=document.createElement('canvas');canvas.width=512;canvas.height=128;
+ const ctx=canvas.getContext('2d');ctx.fillStyle='#fff8ed';ctx.fillRect(0,0,512,128);ctx.fillStyle='#493d43';ctx.font='bold 42px sans-serif';ctx.textAlign='center';ctx.fillText(title,256,82);
+ const tex=new THREE.CanvasTexture(canvas);
+ addMesh(new THREE.PlaneGeometry(8,2),new THREE.MeshBasicMaterial({map:tex,transparent:true,side:THREE.DoubleSide}),x,cityTop+4.1,z-2.65);
+ const lamp=new THREE.PointLight(color,.55,12);lamp.position.set(x,cityTop+4,z);scene.add(lamp);
+}
+addDepartmentDisplay(mallX+8,mallZ+11,0xc77fa3,'星光彩妝','makeup');
+addDepartmentDisplay(mallX-25,mallZ+12,0x83a9d9,'服飾精品','fashion');
+addDepartmentDisplay(mallX+27,mallZ+12,0xe6a76d,'美食甜點','food');
+addDepartmentDisplay(mallX-25,mallZ-13,0xc69be8,'星光飾品','accessory');
+addDepartmentDisplay(mallX+27,mallZ-13,0xe58eae,'香氛選物','perfume');
+addDepartmentDisplay(mallX-34,mallZ+33,0x8bb6a5,'鞋履專門','shoes');
+let activeShop='makeup';
+// Five additional explorable districts: each has its own landmark, lights and atmosphere.
+const extraPlaces=[
+ {x:-315,z:8,name:'琉璃燈籠小鎮',color:0xffb66e,kind:'town'},
+ {x:8,z:315,name:'櫻花月泉島',color:0xffa8d5,kind:'sakura'},
+ {x:350,z:260,name:'星帆海岸村',color:0x72dfff,kind:'coast'},
+ {x:-320,z:-315,name:'蘑菇祕境森林',color:0xc6a0ff,kind:'mushroom'},
+ {x:80,z:-320,name:'風車雲丘',color:0xffe19a,kind:'wind'}
+];
+for(const place of extraPlaces){
+ const {x,z,color,kind}=place,y=heightAt(x,z),glowMat=new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.7});
+ // A small welcoming plaza and a glowing landmark mark each district.
+ addMesh(new THREE.CylinderGeometry(25,29,2.2,32),new THREE.MeshStandardMaterial({color:0x59627b,roughness:.9}),x,y-0.4,z);
+ addMesh(new THREE.CylinderGeometry(8,9,.5,24),new THREE.MeshStandardMaterial({color:0x9b8c9e,roughness:.7}),x,y+1,z);
+ const beacon=addMesh(new THREE.OctahedronGeometry(3.8,1),glowMat,x,y+8,z);
+ const beaconLight=new THREE.PointLight(color,1.8,65);beaconLight.position.set(x,y+10,z);scene.add(beaconLight);
+ if(kind==='town'){
+  for(let i=0;i<8;i++){const a=i*Math.PI/4,h=rand(8,13),hx=x+Math.cos(a)*17,hz=z+Math.sin(a)*17;
+   addMesh(new THREE.BoxGeometry(8,h,7),new THREE.MeshStandardMaterial({color:[0x9e6c62,0x687f9c,0x9a8060,0x8c729a][i%4],roughness:.85}),hx,y+h/2,hz);
+   addMesh(new THREE.ConeGeometry(6,5,4),new THREE.MeshStandardMaterial({color:0x51465e}),hx,y+h+2.5,hz);
+   const win=addMesh(new THREE.BoxGeometry(1.4,2.1,.18),glowMat,hx,y+4,hz+3.58);win.castShadow=false;block(hx,hz,4.8);
+  }
+  for(let i=0;i<12;i++){const a=i*Math.PI/6,lx=x+Math.cos(a)*28,lz=z+Math.sin(a)*28;const pole=addMesh(new THREE.CylinderGeometry(.16,.2,5,7),goldMat,lx,y+2.5,lz);const orb=addMesh(new THREE.SphereGeometry(.55,8,7),glowMat,lx,y+5.2,lz);const lamp=new THREE.PointLight(color,.35,12);lamp.position.copy(orb.position);scene.add(lamp);}
+ }else if(kind==='sakura'){
+  for(let i=0;i<19;i++){const tx=x+rand(-30,30),tz=z+rand(-30,30);addMesh(new THREE.CylinderGeometry(.35,.55,6,7),woodMat,tx,y+3,tz);const crown=addMesh(new THREE.SphereGeometry(rand(3.4,5),10,8),new THREE.MeshStandardMaterial({color:0xc979a7,roughness:1}),tx,y+8,tz);crown.scale.y=.8;}
+  const pond=addMesh(new THREE.CylinderGeometry(15,17,.45,40),new THREE.MeshPhysicalMaterial({color:0x6ab9d5,transparent:true,opacity:.8,roughness:.18}),x+4,y+1.3,z-5);
+  const moon=addMesh(new THREE.TorusGeometry(5,.35,8,36),glowMat,x+4,y+4,z-5);moon.rotation.x=Math.PI/2;
+ }else if(kind==='coast'){
+  for(let i=0;i<7;i++){const px=x-24+i*8,pz=z+rand(-15,15);addMesh(new THREE.CylinderGeometry(.3,.45,rand(8,15),7),woodMat,px,y+4,pz);addMesh(new THREE.ConeGeometry(4,7,7),new THREE.MeshStandardMaterial({color:0x477d76}),px,y+12,pz);}
+  for(let i=0;i<4;i++){const sail=addMesh(new THREE.ConeGeometry(3.8,9,3),new THREE.MeshStandardMaterial({color:i%2?0xf2d7a0:0x9bd9e8,side:THREE.DoubleSide}),x-18+i*12,y+6,z+25);sail.rotation.z=Math.PI/2;}
+ }else if(kind==='mushroom'){
+  for(let i=0;i<24;i++){const mx=x+rand(-32,32),mz=z+rand(-32,32),h=rand(4,10),r=rand(2.8,5);addMesh(new THREE.CylinderGeometry(.55,.8,h,7),new THREE.MeshStandardMaterial({color:0xe3d2b8}),mx,y+h/2,mz);addMesh(new THREE.SphereGeometry(r,10,8),new THREE.MeshStandardMaterial({color:[0x9c73c9,0xc46f9e,0x688eb5][i%3],emissive:0x26173b,emissiveIntensity:.25}),mx,y+h,mz).scale.y=.48;}
+ }else{
+  for(let i=0;i<5;i++){const wx=x-22+i*11,wz=z+rand(-12,12);addMesh(new THREE.CylinderGeometry(.55,.8,15,8),woodMat,wx,y+7.5,wz);const blades=new THREE.Group();blades.position.set(wx,y+16,wz);scene.add(blades);for(let b=0;b<4;b++){const blade=addMesh(new THREE.BoxGeometry(1.2,10,.45),glowMat,0,5,0);blade.position.set(0,5,0);blade.rotation.z=b*Math.PI/2;blades.add(blade);} }
+ }
+}
+
+
+// Moonfall waterfall v2: a curved, segmented water sheet that hugs the cliff face.
+const cliffX=175,cliffZ=-115,cliffY=heightAt(cliffX,cliffZ);
+for(let i=0;i<11;i++){
+ const a=i/11*Math.PI*2,rx=rand(12,22),rz=rand(9,17),x=cliffX+Math.cos(a)*rx,z=cliffZ+Math.sin(a)*rz;
+ const rock=addMesh(new THREE.DodecahedronGeometry(rand(8,14),1),rockMats[i%3],x,cliffY+rand(8,25),z,1.1,rand(1.1,1.8),.9);rock.rotation.y=rand(0,6);
+}
+const waterMat=new THREE.MeshPhysicalMaterial({color:0x9ceaff,emissive:0x287da8,emissiveIntensity:.42,transparent:true,opacity:.79,roughness:.12,metalness:.05,clearcoat:1,clearcoatRoughness:.08,side:THREE.DoubleSide,depthWrite:false});
+function makeCliffWater(offset=0,width=7){
+ const rows=34,cols=8,vertices=[],indices=[];
+ for(let j=0;j<=rows;j++){
+  const t=j/rows;
+  for(let i=0;i<=cols;i++){
+   const u=i/cols-.5,flowX=cliffX+Math.sin(t*5.2+offset)*2.2+u*width;
+   const flowY=cliffY+24-t*27+Math.sin(t*18+u*4+offset)*.28;
+   const faceZ=cliffZ+8+t*30+Math.sin(t*4+offset)*1.1-Math.max(0,Math.abs(u)-.34)*2.5;
+   vertices.push(flowX,flowY,faceZ);
+  }
+ }
+ for(let j=0;j<rows;j++)for(let i=0;i<cols;i++){const a=j*(cols+1)+i,b=a+cols+1;indices.push(a,b,a+1,b,b+1,a+1);}
+ const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(vertices,3));g.setIndex(indices);g.computeVertexNormals();
+ const mesh=new THREE.Mesh(g,waterMat);mesh.material=waterMat;mesh.userData.flowOffset=offset;scene.add(mesh);return mesh;
+}
+const falls=[makeCliffWater(0,8.5),makeCliffWater(2.1,4.2),makeCliffWater(4.3,3.1)];
+// A shallow pool whose shoreline follows the same rolling terrain instead of a floating flat disc.
+const poolGeo=new THREE.CircleGeometry(27,64,0,Math.PI*2);poolGeo.rotateX(-Math.PI/2);
+const pp=poolGeo.attributes.position;
+for(let i=0;i<pp.count;i++){
+ const x=cliffX+pp.getX(i)*1.48,z=cliffZ+38+pp.getZ(i)*.88;
+ pp.setXYZ(i,pp.getX(i)*1.48,heightAt(x,z)-.48-(1-Math.min(1,Math.hypot(pp.getX(i),pp.getZ(i))/27))*.15,pp.getZ(i)*.88);
+}
+poolGeo.computeVertexNormals();
+const pool=new THREE.Mesh(poolGeo,new THREE.MeshPhysicalMaterial({color:0x48b9d2,emissive:0x123f65,emissiveIntensity:.3,transparent:true,opacity:.78,roughness:.12,metalness:.08,clearcoat:1,side:THREE.DoubleSide,depthWrite:false}));pool.position.set(cliffX,0,cliffZ+38);scene.add(pool);
+// Foam at the impact edge and soft spray around the base.
+for(let i=0;i<34;i++){
+ const a=i/34*Math.PI*2,r=rand(14,30),x=cliffX+Math.cos(a)*r,z=cliffZ+38+Math.sin(a)*r*.65,y=heightAt(x,z)+.12;
+ const foam=addMesh(new THREE.SphereGeometry(rand(.35,.9),8,6),new THREE.MeshBasicMaterial({color:0xc8f4ff,transparent:true,opacity:.38}),x,y,z,rand(1.2,2.4),.22,rand(.8,1.5));foam.castShadow=false;
+}
+for(let i=0;i<42;i++){const mist=new THREE.Mesh(new THREE.SphereGeometry(rand(1.2,3.2),8,7),new THREE.MeshBasicMaterial({color:0xc9eaff,transparent:true,opacity:.12}));mist.position.set(cliffX+rand(-27,27),cliffY+rand(-2,16),cliffZ+rand(24,55));mist.scale.y=.7;scene.add(mist);}
+for(let i=0;i<13;i++){const crystal=addMesh(new THREE.OctahedronGeometry(rand(.8,1.8)),new THREE.MeshStandardMaterial({color:0x9cecff,emissive:0x3daddd,emissiveIntensity:1.2,roughness:.2}),cliffX+rand(-27,27),cliffY+rand(2,18),cliffZ+rand(-8,44));}
+
+// Winding stream reflecting the moonlight
+for(let i=0;i<34;i++){const z=-200+i*12,x=70+Math.sin(i*.2)*38;const s=addMesh(new THREE.CylinderGeometry(1.4,2,12,8),new THREE.MeshStandardMaterial({color:0x4d9fc1,transparent:true,opacity:.78,roughness:.2}),x,heightAt(x,z)+.25,z);s.rotation.z=Math.PI/2;s.rotation.y=.3;}
+
+// Ancient moon gate
+for(let side=0;side<2;side++){const col=addMesh(new THREE.CylinderGeometry(1.8,2.3,15,9),rockMats[0],cliffX+(side?8:-8),cliffY+8,cliffZ-25);}
+const lintel=addMesh(new THREE.BoxGeometry(21,3,4),rockMats[1],cliffX,cliffY+16,cliffZ-25);
+for(let i=0;i<12;i++){const orb=addMesh(new THREE.SphereGeometry(.38,8,8),new THREE.MeshStandardMaterial({color:0xffe6a5,emissive:0xffc66c,emissiveIntensity:1.6}),cliffX+rand(-23,23),cliffY+rand(4,16),cliffZ+rand(-36,42));}
+
+// Four distinct exploration districts across the large island
+const regionLabels=[
+ {name:'月霧花園',x:-245,z:-235,color:0xe6b9ff},
+ {name:'水晶洞窟',x:275,z:225,color:0x86eaff},
+ {name:'古代星門遺跡',x:-255,z:235,color:0xffd78c},
+ {name:'雲海港灣',x:275,z:-235,color:0xa9d9ff}
+];
+// Moon-mist garden: glowing flowers and pale trees
+for(let i=0;i<95;i++){const a=rand(0,Math.PI*2),r=rand(12,65),x=-245+Math.cos(a)*r,z=-235+Math.sin(a)*r,y=heightAt(x,z);const stem=addMesh(new THREE.CylinderGeometry(.09,.13,1.1,5),mat(0x638b83),x,y+.55,z);const glow=addMesh(new THREE.SphereGeometry(rand(.35,.7),9,8),new THREE.MeshStandardMaterial({color:0xf1caff,emissive:0xa45bcf,emissiveIntensity:1.5}),x,y+1.2,z);if(i%9===0){const l=new THREE.PointLight(0xc88cff,.7,22);l.position.set(x,y+2,z);scene.add(l);}}
+for(let i=0;i<13;i++){const x=-245+rand(-58,58),z=-235+rand(-58,58),y=heightAt(x,z);block(x,z,2.4);addMesh(new THREE.CylinderGeometry(.35,.7,7,7),mat(0x75628a),x,y+3.5,z);addMesh(new THREE.SphereGeometry(4.2,10,9),mat(0x9d82b5),x,y+8,z,1,1.25,1);}
+// Crystal cave: layered rock arch and luminous crystal clusters
+for(let i=0;i<18;i++){const a=i/18*Math.PI*2;if(Math.abs(Math.atan2(Math.sin(a),Math.cos(a)))<.34)continue;const x=275+Math.cos(a)*29,z=225+Math.sin(a)*23,y=heightAt(x,z);const h=rand(10,21);const rock=addMesh(new THREE.ConeGeometry(rand(5,9),h,7),mat(0x465b79),x,y+h/2-1,z);rock.rotation.z=rand(-.15,.15);block(x,z,4.5);}
+for(let i=0;i<55;i++){const x=275+rand(-38,38),z=225+rand(-30,30),y=heightAt(x,z);const crystal=addMesh(new THREE.ConeGeometry(rand(.8,2.2),rand(4,10),6),new THREE.MeshStandardMaterial({color:i%2?0x83eaff:0xb5a5ff,emissive:i%2?0x237eae:0x6550aa,emissiveIntensity:1.2,roughness:.25}),x,y+2.5,z);crystal.rotation.z=rand(-.18,.18);}
+// Mineable crystal clusters: glowing deposits that can be collected near the player.
+const mineNodes=[];
+for(let i=0;i<16;i++){
+ const a=i/16*Math.PI*2,r=rand(13,27),x=275+Math.cos(a)*r,z=225+Math.sin(a)*r,y=heightAt(x,z);
+ const group=new THREE.Group();group.position.set(x,y,z);scene.add(group);
+ const glowMat=new THREE.MeshStandardMaterial({color:i%2?0x83eaff:0xc4a5ff,emissive:i%2?0x258fcb:0x7256b9,emissiveIntensity:1.8,roughness:.18,metalness:.12});
+ for(let k=0;k<3;k++){const shard=new THREE.Mesh(new THREE.OctahedronGeometry(rand(1.1,1.8),0),glowMat);shard.position.set((k-1)*1.15,rand(1.2,2.8),rand(-.8,.8));shard.rotation.set(rand(-.3,.3),rand(0,6),rand(-.2,.2));shard.castShadow=true;group.add(shard);}
+ const light=new THREE.PointLight(0x79dfff,.55,9);light.position.y=2;group.add(light);
+ mineNodes.push({group,x,z,available:true,respawn:0});
+}
+
+// Ancient star-gate ruins with broken columns and a stone path
+for(let i=0;i<9;i++){const a=i/9*Math.PI*2,x=-255+Math.cos(a)*27,z=235+Math.sin(a)*27,y=heightAt(x,z);const h=rand(7,13);const col=addMesh(new THREE.CylinderGeometry(1.6,2.1,h,8),mat(0x8d8290),x,y+h/2,z);col.rotation.z=rand(-.12,.12);block(x,z,3.2);}
+const ruinTop=addMesh(new THREE.BoxGeometry(42,3,5),mat(0xa99a9b),-255,heightAt(-255,208)+13,208);ruinTop.rotation.z=.08;
+for(let i=0;i<24;i++){const x=-255+rand(-34,34),z=235+rand(-34,34),y=heightAt(x,z);addMesh(new THREE.DodecahedronGeometry(rand(1.2,3),1),mat(0x7f7788),x,y+1,z,1.4,.7,1);}
+// Cloud Sea Harbor: a wide moonlit bay, wooden piers, boats and a deep sea of clouds.
+const harborX=275,harborZ=-235,harborY=heightAt(harborX,harborZ);
+const harborWaterMat=new THREE.MeshPhysicalMaterial({color:0x287f9f,emissive:0x0b344e,emissiveIntensity:.48,transparent:true,opacity:.88,roughness:.16,metalness:.12,clearcoat:1,clearcoatRoughness:.08,side:THREE.DoubleSide,depthWrite:false});
+// Broad oval water basin; the terrain beneath is gently flattened so the water joins the shoreline.
+const bayGeo=new THREE.PlaneGeometry(118,82,44,32);bayGeo.rotateX(-Math.PI/2);
+const bp=bayGeo.attributes.position;
+for(let i=0;i<bp.count;i++){const lx=bp.getX(i),lz=bp.getZ(i);bp.setY(i,harborY+.18+Math.sin(lx*.09+lz*.05)*.10);}
+bayGeo.computeVertexNormals();const harborBay=new THREE.Mesh(bayGeo,harborWaterMat);harborBay.position.set(harborX,0,harborZ);scene.add(harborBay);
+// Moonlight streaks and small ripples across the bay.
+const rippleMat=new THREE.MeshBasicMaterial({color:0xb9eaff,transparent:true,opacity:.24});
+const harborRipples=[];for(let i=0;i<34;i++){const x=harborX+rand(-48,48),z=harborZ+rand(-31,31),y=harborY+.34;const r=addMesh(new THREE.TorusGeometry(rand(1.2,3.8),.055,5,24),rippleMat,x,y,z);r.rotation.x=Math.PI/2;r.scale.x=rand(1.2,2.8);r.userData.phase=rand(0,6.28);harborRipples.push(r);}
+// Wooden piers with posts and warm lanterns.
+const pierMat=mat(0x755b52),postMat=mat(0x493f49);
+function makePier(x,z,length,angle=0){const deck=addMesh(new THREE.BoxGeometry(length,1.0,5.2),pierMat,x,harborY+1.15,z);deck.rotation.y=angle;for(let k=-1;k<=1;k+=2){for(let j=0;j<Math.ceil(length/7);j++){const along=-length/2+j*7;const px=x+Math.cos(angle)*along+Math.sin(angle)*k*2.1,pz=z-Math.sin(angle)*along+Math.cos(angle)*k*2.1;addMesh(new THREE.CylinderGeometry(.28,.38,4.5,7),postMat,px,harborY-1.0,pz);}}}
+makePier(275,-190,58,0);makePier(236,-226,38,Math.PI/2);makePier(314,-222,34,Math.PI/2);
+// Small moored boats, simple but recognizable silhouettes.
+const boatMat=mat(0x604b55),sailMat=new THREE.MeshStandardMaterial({color:0xd9e5ed,roughness:.85,side:THREE.DoubleSide});
+for(let i=0;i<3;i++){const bx=harborX-27+i*25,bz=harborZ+14+(i%2)*15;const hull=addMesh(new THREE.CapsuleGeometry(2.2,7,4,8),boatMat,bx,harborY+.85,bz,1,.32,1);hull.rotation.y=.25+i*.3;const mast=addMesh(new THREE.CylinderGeometry(.12,.16,8,6),postMat,bx,harborY+5,bz);const sail=addMesh(new THREE.PlaneGeometry(4.2,5.6),sailMat,bx+1.9,harborY+5.3,bz);sail.rotation.y=-.3;}
+// A luminous arch at the end of the main pier.
+for(let i=0;i<3;i++){const x=250+i*25,z=-268;const arch=addMesh(new THREE.TorusGeometry(9,1.1,8,28,Math.PI),mat(0x9bb7d8),x,harborY+10,z);arch.rotation.z=Math.PI;}
+for(let i=0;i<24;i++){const x=harborX+rand(-48,48),z=harborZ+rand(-35,35),y=harborY+rand(8,23);const orb=addMesh(new THREE.SphereGeometry(.48,10,8),new THREE.MeshStandardMaterial({color:0xffe5ae,emissive:0xffc56d,emissiveIntensity:2}),x,y,z);const light=new THREE.PointLight(0xffd28b,.42,15);light.position.copy(orb.position);scene.add(light);}
+// Vast layered cloud ocean below the harbor cliffs: soft moonlit cloud banks with drifting tops.
+const cloudSea=new THREE.Group();scene.add(cloudSea);
+const cloudSeaMats=[0x899ac4,0xabb8d8,0x667da9].map((c,i)=>new THREE.MeshStandardMaterial({color:c,emissive:i===1?0x26365c:0x111d42,emissiveIntensity:.24,transparent:true,opacity:i===1?.42:.34,roughness:1,depthWrite:false}));
+for(let layer=0;layer<3;layer++){
+ const y=harborY-18-layer*13,radX=layer===0?175:layer===1?230:285,radZ=layer===0?125:layer===1?180:230;
+ for(let i=0;i<46;i++){const a=rand(0,Math.PI*2),r=Math.sqrt(Math.random()),g=new THREE.Group();for(let j=0;j<5;j++){const puff=new THREE.Mesh(new THREE.SphereGeometry(rand(9,19),10,8),cloudSeaMats[layer]);puff.position.set(rand(-13,13),rand(-2,2),rand(-9,9));puff.scale.set(1.25,.58,1);g.add(puff);}g.position.set(harborX+Math.cos(a)*r*radX,y+rand(-3,3),harborZ+Math.sin(a)*r*radZ);cloudSea.add(g);g.userData.phase=rand(0,6.28);}
+}
+// Summer-night fireflies above the harbor path.
+const harborFireflies=[];for(let i=0;i<32;i++){const f=addMesh(new THREE.SphereGeometry(.22,7,6),new THREE.MeshBasicMaterial({color:0xffe6a0,transparent:true,opacity:.85}),harborX+rand(-75,75),harborY+rand(3,18),harborZ+rand(-60,60));f.userData={phase:rand(0,6.28),baseY:f.position.y};harborFireflies.push(f);}
+
+// Local atmosphere for Moon-mist Garden: layered low fog, moonlit motes and butterflies.
+const gardenFog=new THREE.Group();scene.add(gardenFog);
+const fogMat=new THREE.MeshBasicMaterial({color:0xc7c8ef,transparent:true,opacity:.075,depthWrite:false});
+for(let i=0;i<46;i++){
+ const puff=new THREE.Mesh(new THREE.SphereGeometry(rand(3.5,8),10,8),fogMat);
+ puff.position.set(-245+rand(-78,78),heightAt(-245,-235)+rand(1.5,8),-235+rand(-76,76));
+ puff.scale.set(rand(1.5,2.8),.32,rand(1.2,2.4));puff.userData.baseY=puff.position.y;gardenFog.add(puff);
+}
+const butterflies=[];
+for(let i=0;i<13;i++){
+ const b=new THREE.Group();b.position.set(-245+rand(-54,54),heightAt(-245,-235)+rand(2,10),-235+rand(-54,54));
+ const wingMat=new THREE.MeshBasicMaterial({color:i%3===0?0xffd9f4:(i%3===1?0xd7e8ff:0xffefc1),transparent:true,opacity:.9,side:THREE.DoubleSide});
+ const left=new THREE.Mesh(new THREE.SphereGeometry(.34,8,6),wingMat),right=left.clone();
+ left.scale.set(.85,.16,.52);right.scale.set(.85,.16,.52);left.position.x=-.32;right.position.x=.32;
+ b.add(left,right);b.userData={left,right,phase:rand(0,6.28),origin:b.position.clone()};butterflies.push(b);gardenFog.add(b);
+}
+const gardenGlow=new THREE.PointLight(0xc6a5ff,1.15,105);gardenGlow.position.set(-245,18,-235);scene.add(gardenGlow);
+
+// Crystal cavern: a dark overhead rock vault, deep blue ambient shade and sparse crystal light.
+const caveX=275,caveZ=225,caveY=heightAt(caveX,caveZ);
+const caveShell=new THREE.Mesh(new THREE.SphereGeometry(48,28,18,0,Math.PI*2,0,Math.PI*.53),new THREE.MeshStandardMaterial({color:0x172238,roughness:1,side:THREE.BackSide}));
+caveShell.position.set(caveX,caveY+3,caveZ);caveShell.scale.set(1.12,.92,.92);scene.add(caveShell);
+const caveShade=new THREE.PointLight(0x25395f,.65,95);caveShade.position.set(caveX,caveY+13,caveZ);scene.add(caveShade);
+const caveRays=[];
+for(let i=0;i<7;i++){
+ const x=caveX+rand(-27,27),z=caveZ+rand(-20,20),y=heightAt(x,z);
+ const crystalLight=new THREE.PointLight(i%2?0x63cfff:0x9c8cff,1.0,25);crystalLight.position.set(x,y+5,z);scene.add(crystalLight);caveRays.push(crystalLight);
+}
+const caveDust=[];
+for(let i=0;i<34;i++){
+ const mote=addMesh(new THREE.SphereGeometry(.12,6,5),new THREE.MeshBasicMaterial({color:i%2?0x9ceaff:0xc8baff,transparent:true,opacity:.7}),caveX+rand(-33,33),caveY+rand(2,24),caveZ+rand(-28,28));mote.castShadow=false;caveDust.push(mote);
+}
+
+// Local music and richer, location-aware procedural ambience.
+const musicInput=document.querySelector('#musicFile'),musicButton=document.querySelector('#musicBtn');
+const userAudio=new Audio();userAudio.loop=true;userAudio.volume=.42;
+musicButton.addEventListener('click',()=>musicInput.click());
+musicInput.addEventListener('change',()=>{const file=musicInput.files&&musicInput.files[0];if(!file)return;userAudio.src=URL.createObjectURL(file);userAudio.play().then(()=>{musicButton.textContent='🎵 '+file.name.slice(0,12);}).catch(()=>{musicButton.textContent='點一下播放音樂';});});
+const ambienceButton=document.querySelector('#ambienceBtn');
+let ambienceContext=null,ambienceOn=false,ambienceMaster=null,ambienceLayers={},ambienceStarted=false,lastAmbienceScene='';
+function makeNoiseLayer(ctx,kind,volume,cutoff){
+ const buffer=ctx.createBuffer(1,ctx.sampleRate*5,ctx.sampleRate),data=buffer.getChannelData(0);
+ let last=0;for(let i=0;i<data.length;i++){const white=Math.random()*2-1;last=last*.94+white*.06;data[i]=kind==='pink'?last*3.2:white*.72;}
+ const src=ctx.createBufferSource();src.buffer=buffer;src.loop=true;
+ const filter=ctx.createBiquadFilter();filter.type=kind==='water'?'bandpass':(kind==='high'?'highpass':'lowpass');filter.frequency.value=cutoff;filter.Q.value=kind==='water'?.8:.45;
+ const gain=ctx.createGain();gain.gain.value=0;src.connect(filter);filter.connect(gain);gain.connect(ambienceMaster);src.start();
+ return {gain,src,filter,base:volume};
+}
+function makeTone(ctx,freq,type,volume){
+ const osc=ctx.createOscillator(),gain=ctx.createGain();osc.type=type;osc.frequency.value=freq;gain.gain.value=0;osc.connect(gain);gain.connect(ambienceMaster);osc.start();return {osc,gain,base:volume};
+}
+function startAmbience(){
+ const AC=window.AudioContext||window.webkitAudioContext;if(!AC){ambienceButton.textContent='此瀏覽器不支援音效';return false;}
+ ambienceContext=new AC();ambienceMaster=ambienceContext.createGain();ambienceMaster.gain.value=0;ambienceMaster.connect(ambienceContext.destination);
+ // Separate sound layers: wind, rushing water, insects, cave resonance and crystal shimmer.
+ ambienceLayers.wind=makeNoiseLayer(ambienceContext,'pink',.23,620);
+ ambienceLayers.water=makeNoiseLayer(ambienceContext,'water',.72,920);
+ ambienceLayers.waterLow=makeNoiseLayer(ambienceContext,'pink',.38,360);
+ ambienceLayers.insects=makeNoiseLayer(ambienceContext,'high',.22,3100);
+ ambienceLayers.hum=makeTone(ambienceContext,86,'sine',.16);
+ ambienceLayers.crystal=makeTone(ambienceContext,392,'sine',.11);
+ ambienceLayers.chime=makeTone(ambienceContext,660,'triangle',.08);
+ ambienceLayers.bird=makeTone(ambienceContext,1180,'sine',.035);
+ const t=ambienceContext.currentTime;
+ // Gentle independent modulation makes the soundscape move rather than stay flat.
+ const lfo=ambienceContext.createOscillator(),lfoGain=ambienceContext.createGain();lfo.frequency.value=.13;lfoGain.gain.value=170;lfo.connect(lfoGain);lfoGain.connect(ambienceLayers.water.filter.frequency);lfo.start();
+ const windLfo=ambienceContext.createOscillator(),windGain=ambienceContext.createGain();windLfo.frequency.value=.07;windGain.gain.value=.09;windLfo.connect(windGain);windGain.connect(ambienceLayers.wind.gain);windLfo.start();
+ ambienceStarted=true;return true;
+}
+function setAmbienceScene(x,z){
+ if(!ambienceStarted||!ambienceOn)return;
+ const waterfall=Math.hypot(x-cliffX,z-cliffZ)<95;
+ const garden=Math.hypot(x+245,z+235)<105;
+ const cave=Math.hypot(x-275,z-225)<90;
+ const harbor=Math.hypot(x-275,z+235)<110;
+ const city=Math.hypot(x-cityX,z-cityZ)<112;
+ const sceneKey=city?'city':waterfall?'waterfall':garden?'garden':cave?'cave':harbor?'harbor':'meadow';
+ if(sceneKey===lastAmbienceScene)return;lastAmbienceScene=sceneKey;
+ const t=ambienceContext.currentTime;
+ const profile=waterfall?{wind:.20,water:.95,waterLow:.82,insects:.04,hum:.04,crystal:.02,chime:.04,bird:.01}
+ :garden?{wind:.48,water:.08,waterLow:.04,insects:.78,hum:.04,crystal:.10,chime:.42,bird:.08}
+ :cave?{wind:.04,water:.18,waterLow:.12,insects:.01,hum:.92,crystal:.82,chime:.38,bird:0}
+ :harbor?{wind:.30,water:.92,waterLow:.68,insects:.18,hum:.06,crystal:.08,chime:.20,bird:.72}
+ :city?{wind:.12,water:.32,waterLow:.18,insects:.02,hum:.48,crystal:.22,chime:.75,bird:.04}
+ :{wind:.60,water:.06,waterLow:.02,insects:.12,hum:.04,crystal:.04,chime:.12,bird:.42};
+ for(const [key,value] of Object.entries(profile)){const layer=ambienceLayers[key];if(layer)layer.gain.gain.setTargetAtTime(layer.base*value,t,1.25);}
+ if(ambienceLayers.hum)ambienceLayers.hum.osc.frequency.setTargetAtTime(cave?72:(garden?112:waterfall?94:harbor?118:86),t,1.6);
+ if(ambienceLayers.crystal)ambienceLayers.crystal.osc.frequency.setTargetAtTime(cave?294:(garden?523:392),t,1.6);
+ if(ambienceLayers.chime)ambienceLayers.chime.osc.frequency.setTargetAtTime(cave?440:(garden?784:waterfall?587:harbor?698:660),t,1.6);
+ if(ambienceLayers.bird)ambienceLayers.bird.osc.frequency.setTargetAtTime(meadowFrequency(),t,1.6);
+ function meadowFrequency(){return waterfall?900:garden?1040:cave?520:harbor?820:1180;}
+}
+ambienceButton.addEventListener('click',async()=>{
+ if(!ambienceStarted&&!startAmbience())return;
+ await ambienceContext.resume();ambienceOn=!ambienceOn;
+ ambienceMaster.gain.setTargetAtTime(ambienceOn?.88:0,ambienceContext.currentTime,.35);
+ ambienceButton.textContent=ambienceOn?'🌿 環境音：開':'🌬️ 環境音：關';
+ if(ambienceOn){lastAmbienceScene='';setAmbienceScene(player.position.x,player.position.z);}
+});
+// Character
+const player=new THREE.Group(),bodyMat=mat(0x293b55);
+const body=new THREE.Mesh(new THREE.CapsuleGeometry(.85,2,4,8),bodyMat);body.position.y=2.45;body.castShadow=true;player.add(body);
+const headMat=mat(0xffdfc6);const head=new THREE.Mesh(new THREE.SphereGeometry(.78,20,16),headMat);head.position.y=4.55;player.add(head);
+const lipMat=new THREE.MeshStandardMaterial({color:0xb85d79,roughness:.65});const lips=new THREE.Mesh(new THREE.SphereGeometry(.13,12,8),lipMat);lips.scale.set(1.25,.42,.35);lips.position.set(0,4.31,.735);player.add(lips);
+const cheekMat=new THREE.MeshStandardMaterial({color:0xf39ab0,transparent:true,opacity:.0,roughness:1});const cheekL=new THREE.Mesh(new THREE.SphereGeometry(.12,12,8),cheekMat),cheekR=cheekL.clone();cheekL.scale.set(1.2,.65,.25);cheekR.scale.copy(cheekL.scale);cheekL.position.set(-.39,4.43,.66);cheekR.position.set(.39,4.43,.66);player.add(cheekL,cheekR);
+// Removed the old large triangular cape mesh from the character.
+const legGeo=new THREE.CapsuleGeometry(.28,.85,3,6),legL=new THREE.Mesh(legGeo,bodyMat),legR=legL.clone();legL.position.set(-.4,.7,0);legR.position.set(.4,.7,0);player.add(legL,legR);
+player.position.set(0,heightAt(0,0),0);scene.add(player);
+
+// A small moonlit exploration buggy. It is intentionally simple and light for phones.
+const car=new THREE.Group();
+const carBody=new THREE.Mesh(new THREE.BoxGeometry(4.2,1.15,6.2),new THREE.MeshStandardMaterial({color:0x527d91,metalness:.35,roughness:.42}));
+carBody.position.y=1.65;carBody.castShadow=true;car.add(carBody);
+const cabin=new THREE.Mesh(new THREE.BoxGeometry(3.1,1.45,2.8),new THREE.MeshStandardMaterial({color:0xa9d7e4,transparent:true,opacity:.68,roughness:.2}));
+cabin.position.set(0,2.85,-.35);cabin.castShadow=true;car.add(cabin);
+const roof=new THREE.Mesh(new THREE.BoxGeometry(3.3,.22,3),new THREE.MeshStandardMaterial({color:0xe2d4b5,metalness:.25,roughness:.4}));
+roof.position.set(0,3.62,-.35);car.add(roof);
+const wheelMat=new THREE.MeshStandardMaterial({color:0x202a3c,roughness:.9});
+const wheels=[];
+for(const x of [-2.05,2.05]) for(const z of [-2,2]){
+ const w=new THREE.Mesh(new THREE.CylinderGeometry(.82,.82,.48,16),wheelMat);
+ w.rotation.z=Math.PI/2;w.position.set(x,.92,z);w.castShadow=true;car.add(w);wheels.push(w);
+}
+const lampMat=new THREE.MeshStandardMaterial({color:0xffefbd,emissive:0xffd27a,emissiveIntensity:1.8});
+for(const x of [-1.35,1.35]){const lamp=new THREE.Mesh(new THREE.SphereGeometry(.32,10,8),lampMat);lamp.position.set(x,1.9,-3.12);car.add(lamp);}
+car.visible=false;scene.add(car);
+let driving=false,carSpeed=0,throttle=0,brake=0;
+const vehicleBtn=document.querySelector('#vehicle'),gasBtn=document.querySelector('#gas'),brakeBtn=document.querySelector('#brake');
+vehicleBtn.addEventListener('click',()=>{
+ driving=!driving;carSpeed=0;car.visible=driving;player.visible=!driving;
+ if(driving){car.position.set(player.position.x,groundAt(player.position.x,player.position.z),player.position.z);car.rotation.y=player.rotation.y;vehicleBtn.textContent='🚶 下車';}
+ else {player.position.set(car.position.x+Math.sin(car.rotation.y)*4,groundAt(car.position.x,car.position.z),car.position.z+Math.cos(car.rotation.y)*4);vehicleBtn.textContent='🚗 上車';}
+ gasBtn.style.display=driving?'block':'none';brakeBtn.style.display=driving?'block':'none';document.querySelector('#jump').style.display=driving?'none':'block';
+});
+function holdButton(el,setter){el.addEventListener('pointerdown',e=>{e.preventDefault();setter(1);el.setPointerCapture(e.pointerId);});const stop=()=>setter(0);el.addEventListener('pointerup',stop);el.addEventListener('pointercancel',stop);el.addEventListener('lostpointercapture',stop);}
+holdButton(gasBtn,v=>throttle=v);holdButton(brakeBtn,v=>brake=v);
+
+
+// Crystal economy and Minecraft-like block building.
+let crystals=0,coins=0,woodBlocks=0,buildMode=false;try{coins=Number(localStorage.getItem('dreamIslandsCoins')||0)||0;crystals=Number(localStorage.getItem('dreamIslandsDiamonds')||0)||0;}catch(e){}
+const wallet=document.querySelector('#wallet'),mineBtn=document.querySelector('#mineBtn'),sellBtn=document.querySelector('#sellBtn'),buyBtn=document.querySelector('#buyBtn'),buildBtn=document.querySelector('#buildBtn'),buildHint=document.querySelector('#buildHint');
+function updateWallet(){try{localStorage.setItem('dreamIslandsCoins',String(coins));localStorage.setItem('dreamIslandsDiamonds',String(crystals));}catch(e){}const px=driving?car.position.x:player.position.x,pz=driving?car.position.z:player.position.z;wallet.textContent=`💎 鑽石 ${crystals}　🪙 金幣 ${coins}　🪵 木塊 ${woodBlocks}`;mineBtn.disabled=!mineNodes.some(n=>n.available&&Math.hypot(px-n.x,pz-n.z)<24);sellBtn.disabled=crystals<1;buyBtn.disabled=coins<1;}
+function saveBuild(){try{localStorage.setItem('dreamIslandsBuildV1',JSON.stringify(placedBlocks.map(b=>({x:b.position.x,y:b.position.y,z:b.position.z}))));}catch(e){}}
+const placedBlocks=[];
+const woodBlockMat=new THREE.MeshStandardMaterial({color:0x9b7048,roughness:.88});
+const placedFurniture=[];let selectedFurniture='chair';
+const furniturePanel=document.querySelector('#furniturePanel');
+const furnitureNames={chair:'木椅',table:'小桌',sofa:'沙發',bed:'床',lamp:'庭院燈',plant:'盆栽',woodblock:'木建材'};
+function makeFurniture(type,x,y,z){
+ const g=new THREE.Group();g.position.set(x,y,z);const wood=new THREE.MeshStandardMaterial({color:0x916747,roughness:.86}),cushion=new THREE.MeshStandardMaterial({color:0x9d83bd,roughness:.9}),metal=new THREE.MeshStandardMaterial({color:0x454b61,metalness:.45,roughness:.5});
+ const add=(geo,ma,px,py,pz)=>{const m=new THREE.Mesh(geo,ma);m.position.set(px,py,pz);m.castShadow=true;m.receiveShadow=true;g.add(m);return m;};
+ if(type==='chair'){add(new THREE.BoxGeometry(1.8,.22,1.7),wood,0,1.25,0);add(new THREE.BoxGeometry(1.8,1.7,.22),wood,0,2.05,-.72);for(const a of [-.68,.68])for(const b of [-.62,.62])add(new THREE.BoxGeometry(.2,1.25,.2),wood,a,.62,b);}
+ if(type==='table'){add(new THREE.BoxGeometry(3,.25,2.1),wood,0,1.8,0);for(const a of [-1.2,1.2])for(const b of [-.75,.75])add(new THREE.BoxGeometry(.2,1.8,.2),wood,a,.9,b);}
+ if(type==='sofa'){add(new THREE.BoxGeometry(3.8,.65,1.7),cushion,0,1.1,0);add(new THREE.BoxGeometry(3.8,1.4,.3),cushion,0,1.8,-.72);for(const a of [-1.8,1.8])add(new THREE.BoxGeometry(.3,1.15,1.7),wood,a,1.55,0);}
+ if(type==='bed'){add(new THREE.BoxGeometry(3.2,.45,4.4),wood,0,.55,0);add(new THREE.BoxGeometry(3, .35,4.1),cushion,0,.95,0);add(new THREE.BoxGeometry(3,.55,.55),new THREE.MeshStandardMaterial({color:0xe7d9ef}),0,1.35,-1.65);}
+ if(type==='lamp'){add(new THREE.CylinderGeometry(.12,.2,2.5,8),metal,0,1.25,0);add(new THREE.SphereGeometry(.62,12,10),new THREE.MeshStandardMaterial({color:0xffe6a4,emissive:0xffc45c,emissiveIntensity:1.5}),0,2.65,0);}
+ if(type==='plant'){add(new THREE.CylinderGeometry(.48,.58,.8,12),new THREE.MeshStandardMaterial({color:0xb87858}),0,.4,0);for(let i=0;i<5;i++){const leaf=add(new THREE.SphereGeometry(.45,8,7),new THREE.MeshStandardMaterial({color:i%2?0x4f956c:0x78a878}),Math.cos(i*1.25)*.4,1.25+Math.sin(i*1.25)*.35,Math.sin(i*1.25)*.4);leaf.scale.set(.7,1.5,.6);}}
+ scene.add(g);placedFurniture.push({type,x,y,z,group:g});return g;
+}
+function saveFurniture(){try{localStorage.setItem('dreamIslandsFurnitureV1',JSON.stringify(placedFurniture.map(o=>({type:o.type,x:o.x,y:o.y,z:o.z}))));}catch(e){}}
+function loadFurniture(){try{const a=JSON.parse(localStorage.getItem('dreamIslandsFurnitureV1')||'[]');if(Array.isArray(a))a.forEach(o=>{if(furnitureNames[o.type])makeFurniture(o.type,o.x,o.y,o.z);});}catch(e){}}
+function placeFurniture(type,x,z){const gx=Math.round(x/2)*2,gz=Math.round(z/2)*2;makeFurniture(type,gx,heightAt(gx,gz),gz);saveFurniture();}
+loadFurniture();
+document.querySelectorAll('[data-furniture]').forEach(b=>b.addEventListener('click',()=>{selectedFurniture=b.dataset.furniture;document.querySelectorAll('[data-furniture]').forEach(x=>x.style.outline=x===b?'2px solid #ffe6ad':'none');buildHint.textContent='已選擇'+furnitureNames[selectedFurniture]+'，點擊地面放置';}));
+function placeWoodBlock(x,z){
+ const gx=Math.round(x/3)*3,gz=Math.round(z/3)*3,gy=heightAt(gx,gz)+1.5;
+ let level=0;for(const b of placedBlocks){if(Math.abs(b.position.x-gx)<.1&&Math.abs(b.position.z-gz)<.1)level=Math.max(level,Math.round((b.position.y-heightAt(gx,gz)-1.5)/3)+1);}
+ const blockMesh=new THREE.Mesh(new THREE.BoxGeometry(3,3,3),woodBlockMat);blockMesh.position.set(gx,gy+level*3,gz);blockMesh.castShadow=true;blockMesh.receiveShadow=true;scene.add(blockMesh);placedBlocks.push(blockMesh);block(gx,gz,2.35);woodBlocks--;saveBuild();updateWallet();
+}
+function loadBuild(){try{const data=JSON.parse(localStorage.getItem('dreamIslandsBuildV1')||'[]');for(const q of data){const m=new THREE.Mesh(new THREE.BoxGeometry(3,3,3),woodBlockMat);m.position.set(q.x,q.y,q.z);m.castShadow=true;m.receiveShadow=true;scene.add(m);placedBlocks.push(m);block(q.x,q.z,2.35);}}catch(e){}}
+loadBuild();
+mineBtn.addEventListener('click',()=>{let nearest=null,dist=24;for(const n of mineNodes){const px=typeof driving!=='undefined'&&driving?car.position.x:player.position.x,pz=typeof driving!=='undefined'&&driving?car.position.z:player.position.z;const d=Math.hypot(px-n.x,pz-n.z);if(n.available&&d<dist){nearest=n;dist=d;}}if(!nearest){mineBtn.textContent='靠近水晶礦再挖';setTimeout(()=>mineBtn.textContent='⛏️ 挖水晶',1100);return;}nearest.available=false;nearest.group.visible=false;nearest.respawn=90;crystals++;updateWallet();});
+sellBtn.addEventListener('click',()=>{coins+=crystals;crystals=0;updateWallet();});
+buyBtn.addEventListener('click',()=>{if(coins<1)return;coins--;woodBlocks++;updateWallet();});
+buildBtn.addEventListener('click',()=>{buildMode=!buildMode;buildBtn.textContent=buildMode?'✋ 結束建造':'🏡 開始蓋房子';buildHint.style.display=buildMode?'block':'none';furniturePanel.style.display=buildMode?'grid':'none';});
+const buildRaycaster=new THREE.Raycaster(),buildPointer=new THREE.Vector2();
+renderer.domElement.addEventListener('pointerdown',e=>{
+ if(!buildMode||e.clientX<145||e.clientY>innerHeight-145)return;
+ if(woodBlocks<1){buildHint.textContent='木塊不足！先挖水晶、賣掉，再購買木塊';setTimeout(()=>{if(buildMode)buildHint.textContent='建造模式：點擊地面放置木塊，再按一次結束';},1700);return;}
+ buildPointer.x=(e.clientX/innerWidth)*2-1;buildPointer.y=-(e.clientY/innerHeight)*2+1;buildRaycaster.setFromCamera(buildPointer,camera);
+ const hits=buildRaycaster.intersectObject(terrain,false);if(hits.length){const pt=hits[0].point;if(Math.hypot(pt.x-player.position.x,pt.z-player.position.z)<32){if(selectedFurniture==='woodblock')placeWoodBlock(pt.x,pt.z);else if(selectedFurniture&&furniturePanel.style.display==='grid')placeFurniture(selectedFurniture,pt.x,pt.z);else placeWoodBlock(pt.x,pt.z);}}
+});
+updateWallet();
+
+// Boutique, makeup palette, and stamina/food system. Shopping opens only beside the in-world clerk.
+let stamina=100,staminaMax=100;const staminaFill=document.querySelector('#staminaFill'),staminaText=document.querySelector('#staminaText');
+function updateStamina(){stamina=Math.max(0,Math.min(staminaMax,stamina));staminaFill.style.width=(stamina/staminaMax*100)+'%';staminaText.textContent=Math.round(stamina)+'/'+staminaMax;}
+let ownedOutfits=['default'];try{ownedOutfits=JSON.parse(localStorage.getItem('dreamIslandsOutfits')||'["default"]');if(!Array.isArray(ownedOutfits))ownedOutfits=['default'];}catch(e){}
+let equippedOutfit='default';try{equippedOutfit=localStorage.getItem('dreamIslandsEquipped')||'default';}catch(e){}
+const outfitLooks={default:{body:0x293b55,cape:0xe8c8ff},rose:{body:0x8e496e,cape:0xffa9d6},ocean:{body:0x245b83,cape:0x65d9ef},gold:{body:0x8b6828,cape:0xffd86b}};
+function equipOutfit(id){const look=outfitLooks[id]||outfitLooks.default;bodyMat.color.setHex(look.body);cape.material.color.setHex(look.cape);equippedOutfit=id;try{localStorage.setItem('dreamIslandsEquipped',id);}catch(e){}}
+equipOutfit(equippedOutfit);
+let ownedMakeup=[];try{ownedMakeup=JSON.parse(localStorage.getItem('dreamIslandsMakeup')||'[]');if(!Array.isArray(ownedMakeup))ownedMakeup=[];}catch(e){}
+let equippedMakeup='#ff9eb5';try{equippedMakeup=localStorage.getItem('dreamIslandsMakeupEquipped')||'#ff9eb5';}catch(e){}
+function applyMakeup(hex){equippedMakeup=hex;cheekMat.color.set(hex);cheekMat.opacity=.9;lipMat.color.set(hex);try{localStorage.setItem('dreamIslandsMakeupEquipped',hex);}catch(e){}}
+applyMakeup(equippedMakeup);
+const makeupPalette=[['玫瑰粉','#ff9eb5',2],['蜜桃橘','#ffad8f',2],['櫻花粉','#ffb8d8',2],['莓果紅','#d94b78',3],['珊瑚橘','#ff765e',2],['薰衣草紫','#c69bff',2],['夢幻藍','#79caff',3],['薄荷綠','#7ce0c1',2],['香檳金','#f2cf83',3],['星塵銀','#cbd8ee',3],['奶茶棕','#bd8b75',2],['葡萄紫','#9d65c9',3],['夕陽橙','#ff914d',2],['冰晶青','#73e5e8',3],['莓奶茶','#c77c91',2],['月光白','#f2e8ff',3]];
+const makeupWrap=document.querySelector('#makeupColors'),makeupMessage=document.querySelector('#makeupMessage');
+makeupPalette.forEach(([name,hex,cost])=>{const b=document.createElement('button');b.style.cssText=`padding:7px 3px;border-radius:10px;border:2px solid #ffffff88;background:${hex};color:#241a2a;font-size:10px;font-weight:900;min-height:47px;text-shadow:0 1px 1px #fff8`;b.textContent=name+'\n'+cost+'元';b.addEventListener('click',()=>{if(!ownedMakeup.includes(hex)){if(coins<cost){makeupMessage.textContent='金幣不足，這支彩妝筆需要 '+cost+' 元';return;}coins-=cost;ownedMakeup.push(hex);try{localStorage.setItem('dreamIslandsMakeup',JSON.stringify(ownedMakeup));}catch(e){}}applyMakeup(hex);updateWallet();makeupMessage.textContent='已使用 '+name+' 彩妝筆！';});makeupWrap.appendChild(b);});
+const shopPanel=document.querySelector('#shopPanel'),npcBuy=document.querySelector('#npcBuy');function openShop(type,title){activeShop=type;document.querySelector('#shopTitle').textContent=title;document.querySelectorAll('[data-store-section]').forEach(el=>el.style.display='none');const section=document.querySelector('#'+({makeup:'makeupStore',fashion:'fashionStore',food:'foodStore',accessory:'accessoryStore',shoes:'shoesStore',perfume:'perfumeStore'}[type]));if(section)section.style.display='block';document.querySelector('#shopIntro').textContent='這位店員只販售這個專櫃的商品。';shopPanel.style.display='block';}npcBuy.addEventListener('click',()=>openShop(activeShop,activeShopTitle));document.querySelector('#shopClose').addEventListener('click',()=>{shopPanel.style.display='none';});
+let activeShopTitle='🎨 星光彩妝專櫃';
+// All purchased accessories are visible 3D meshes attached to the avatar.
+const accessoryMeshes=new THREE.Group();player.add(accessoryMeshes);
+const goldMatWear=new THREE.MeshStandardMaterial({color:0xf5c96a,metalness:.72,roughness:.28});
+const pinkWear=new THREE.MeshStandardMaterial({color:0xff8fc5,metalness:.18,roughness:.32,emissive:0x4a1730,emissiveIntensity:.18});
+const blueWear=new THREE.MeshStandardMaterial({color:0x9fe7ff,metalness:.22,roughness:.28,emissive:0x173b55,emissiveIntensity:.2});
+const wearableGroups={};
+function wearableGroup(id){const g=new THREE.Group();g.visible=false;accessoryMeshes.add(g);wearableGroups[id]=g;return g;}
+// Butterfly brooch on the front of the chest.
+{const g=wearableGroup('butterfly');const c=new THREE.Mesh(new THREE.SphereGeometry(.105,12,10),goldMatWear);c.position.set(0,3.12,.865);g.add(c);for(const side of [-1,1]){const w=new THREE.Mesh(new THREE.SphereGeometry(.22,14,10),pinkWear);w.scale.set(.95,.68,.42);w.position.set(side*.19,3.19,.84);w.rotation.z=side*-.38;g.add(w);const lo=new THREE.Mesh(new THREE.SphereGeometry(.16,12,9),blueWear);lo.scale.set(.82,.62,.38);lo.position.set(side*.13,3.00,.86);lo.rotation.z=side*.38;g.add(lo);}const sp=new THREE.Mesh(new THREE.OctahedronGeometry(.07,0),new THREE.MeshBasicMaterial({color:0xfff2b8}));sp.position.set(.32,3.34,.86);g.add(sp);}
+// Star hair clip and moon earrings.
+{const g=wearableGroup('star');const star=new THREE.Mesh(new THREE.OctahedronGeometry(.27,0),goldMatWear);star.position.set(.43,5.18,.18);g.add(star);}
+{const g=wearableGroup('moon');for(const side of [-1,1]){const hoop=new THREE.Mesh(new THREE.TorusGeometry(.17,.045,8,16),goldMatWear);hoop.position.set(side*.72,4.35,.1);g.add(hoop);const moonCharm=new THREE.Mesh(new THREE.TorusGeometry(.12,.055,8,16,Math.PI*1.55),new THREE.MeshStandardMaterial({color:0xbfe9ff,metalness:.4,roughness:.25}));moonCharm.position.set(side*.72,4.12,.12);g.add(moonCharm);}}
+// Shoes are placed around both feet.
+for(const id of ['sneakers','boots','sandals']){const g=wearableGroup(id);for(const side of [-1,1]){const shoe=new THREE.Mesh(new THREE.BoxGeometry(.72,.34,1.15),id==='boots'?new THREE.MeshStandardMaterial({color:0x665b87}):id==='sandals'?new THREE.MeshStandardMaterial({color:0xe6b66c}):new THREE.MeshStandardMaterial({color:0x7cc9e9}));shoe.position.set(side*.4,.27,.12);g.add(shoe);if(id==='sandals'){const strap=new THREE.Mesh(new THREE.BoxGeometry(.62,.12,.2),goldMatWear);strap.position.set(side*.4,.46,.12);g.add(strap);}}}
+// Perfume bottle clipped at the waist, with a colored liquid and cap.
+for(const id of ['lavender','ocean','peach']){const g=wearableGroup(id);const colors={lavender:0xb89be8,ocean:0x76cfe0,peach:0xf3a58f};const bottle=new THREE.Mesh(new THREE.CylinderGeometry(.2,.23,.55,12),new THREE.MeshStandardMaterial({color:colors[id],transparent:true,opacity:.9,metalness:.15,roughness:.2}));bottle.position.set(.72,1.65,.2);g.add(bottle);const cap=new THREE.Mesh(new THREE.CylinderGeometry(.12,.12,.16,8),goldMatWear);cap.position.set(.72,2.02,.2);g.add(cap);}
+let ownedAccessories=[];try{ownedAccessories=JSON.parse(localStorage.getItem('dreamIslandsAccessories')||'[]');if(!Array.isArray(ownedAccessories))ownedAccessories=[];}catch(e){}
+let equippedAccessory='';try{equippedAccessory=localStorage.getItem('dreamIslandsAccessoryEquipped')||'';}catch(e){}
+function applyAccessory(id){equippedAccessory=id||'';['star','moon','butterfly'].forEach(key=>{wearableGroups[key].visible=(key===equippedAccessory);});try{localStorage.setItem('dreamIslandsAccessoryEquipped',equippedAccessory);}catch(e){}}
+applyAccessory(equippedAccessory);
+const accessoryPrices={star:4,moon:5,butterfly:6},accessoryNames={star:'星星髮飾',moon:'月亮耳飾',butterfly:'蝴蝶胸針'};
+function refreshAccessoryButtons(){document.querySelectorAll('[data-accessory]').forEach(b=>{const id=b.dataset.accessory;b.textContent=ownedAccessories.includes(id)?(equippedAccessory===id?'✓ 正在佩戴：':'👒 佩戴：')+accessoryNames[id]:'🛍️ '+accessoryNames[id]+'（'+accessoryPrices[id]+' 金幣）';});}
+function buyOrEquipAccessory(id){if(!ownedAccessories.includes(id)){if(coins<accessoryPrices[id])return false;coins-=accessoryPrices[id];ownedAccessories.push(id);try{localStorage.setItem('dreamIslandsAccessories',JSON.stringify(ownedAccessories));}catch(e){}}applyAccessory(id);updateWallet();refreshAccessoryButtons();return true;}
+document.querySelectorAll('[data-accessory]').forEach(btn=>btn.addEventListener('click',()=>{const id=btn.dataset.accessory;if(!buyOrEquipAccessory(id)){btn.textContent='金幣不足，還差 '+(accessoryPrices[id]-coins)+' 元';setTimeout(refreshAccessoryButtons,1300);}}));
+// Shoes and perfume are also equipable; owned items are restored and can be equipped again.
+let ownedSpecial=[];try{ownedSpecial=JSON.parse(localStorage.getItem('dreamIslandsSpecialItems')||'[]');if(!Array.isArray(ownedSpecial))ownedSpecial=[];}catch(e){}
+let equippedSpecial='';try{equippedSpecial=localStorage.getItem('dreamIslandsSpecialEquipped')||'';}catch(e){}
+function applySpecial(id){equippedSpecial=id||'';['sneakers','boots','sandals','lavender','ocean','peach'].forEach(k=>{if(wearableGroups[k])wearableGroups[k].visible=(k===equippedSpecial);});try{localStorage.setItem('dreamIslandsSpecialEquipped',equippedSpecial);}catch(e){}}
+applyAccessory(equippedAccessory);applySpecial(equippedSpecial);
+const specialInfo={sneakers:['星雲運動鞋',6],boots:['月光短靴',8],sandals:['夏夜涼鞋',5],lavender:['月霧薰衣草香氛',5],ocean:['海風白茶香氛',5],peach:['蜜桃晚香香氛',6]};
+function refreshSpecialButtons(){document.querySelectorAll('[data-special]').forEach(b=>{const id=b.dataset.special,info=specialInfo[id];b.textContent=ownedSpecial.includes(id)?((equippedSpecial===id?'✓ 正在佩戴／使用：':'👟 裝備／使用：')+info[0]):'🛍️ '+info[0]+'（'+info[1]+' 金幣）';});}
+function buyOrEquipSpecial(id){const info=specialInfo[id];if(!ownedSpecial.includes(id)){if(coins<info[1])return false;coins-=info[1];ownedSpecial.push(id);try{localStorage.setItem('dreamIslandsSpecialItems',JSON.stringify(ownedSpecial));}catch(e){}}applySpecial(id);updateWallet();refreshSpecialButtons();return true;}
+document.querySelectorAll('[data-special]').forEach(btn=>btn.addEventListener('click',()=>{if(!buyOrEquipSpecial(btn.dataset.special)){btn.textContent='金幣不足，還差 '+(specialInfo[btn.dataset.special][1]-coins)+' 元';setTimeout(refreshSpecialButtons,1300);}}));
+refreshAccessoryButtons();refreshSpecialButtons();
+const outfitPrices={rose:5,ocean:8,gold:12};
+shopPanel.querySelectorAll('[data-outfit]').forEach(btn=>{const id=btn.dataset.outfit;const names={rose:'櫻花披風',ocean:'星海旅人',gold:'金色星辰'};function refresh(){btn.textContent=ownedOutfits.includes(id)?(equippedOutfit===id?'✓ 已穿上：':'👕 穿上：')+names[id]:'🛍️ '+names[id]+'（'+outfitPrices[id]+' 鑽石）';}refresh();btn.addEventListener('click',()=>{if(!ownedOutfits.includes(id)){if(crystals<outfitPrices[id]){btn.textContent='鑽石不足，還差 '+(outfitPrices[id]-crystals)+' 顆';setTimeout(refresh,1300);return;}crystals-=outfitPrices[id];ownedOutfits.push(id);try{localStorage.setItem('dreamIslandsOutfits',JSON.stringify(ownedOutfits));}catch(e){}}equipOutfit(id);updateWallet();shopPanel.querySelectorAll('[data-outfit]').forEach(b=>{const k=b.dataset.outfit;b.textContent=ownedOutfits.includes(k)?(equippedOutfit===k?'✓ 已穿上：':'👕 穿上：')+names[k]:'🛍️ '+names[k]+'（'+outfitPrices[k]+' 鑽石）';});});});
+document.querySelectorAll('[data-special]').forEach(btn=>btn.addEventListener('click',()=>{const id=btn.dataset.special;const info={sneakers:['星雲運動鞋',6],boots:['月光短靴',8],sandals:['夏夜涼鞋',5],lavender:['月霧薰衣草香氛',5],ocean:['海風白茶香氛',5],peach:['蜜桃晚香香氛',6]}[id];let owned=[];try{owned=JSON.parse(localStorage.getItem('dreamIslandsSpecialItems')||'[]');}catch(e){}if(owned.includes(id)){btn.textContent='✓ 已收藏：'+info[0];return;}if(coins<info[1]){btn.textContent='金幣不足，還差 '+(info[1]-coins)+' 元';return;}coins-=info[1];owned.push(id);try{localStorage.setItem('dreamIslandsSpecialItems',JSON.stringify(owned));}catch(e){}updateWallet();btn.textContent='✓ 已收藏：'+info[0];}));
+document.querySelectorAll('[data-food]').forEach(btn=>btn.addEventListener('click',()=>{const info={waffle:['星糖鬆餅',4,55],soda:['藍莓氣泡飲',2,25],icecream:['雲朵冰淇淋',3,35],sandwich:['月光三明治',4,50]}[btn.dataset.food];if(coins<info[1]){btn.textContent='金幣不足，還差 '+(info[1]-coins)+' 元';return;}if(stamina>=staminaMax){btn.textContent='體力已經滿了！';return;}coins-=info[1];stamina=Math.min(staminaMax,stamina+info[2]);updateStamina();updateWallet();btn.textContent='✓ 已享用 '+info[0];}));
+document.querySelector('#foodBtn').addEventListener('click',()=>{if(coins<3){document.querySelector('#foodBtn').textContent='金幣不足，還需要 3 元';setTimeout(()=>document.querySelector('#foodBtn').textContent='🍰 買月光蛋糕（3 金幣，恢復 45 體力）',1300);return;}if(stamina>=staminaMax){document.querySelector('#foodBtn').textContent='體力已經滿了！';setTimeout(()=>document.querySelector('#foodBtn').textContent='🍰 買月光蛋糕（3 金幣，恢復 45 體力）',1100);return;}coins-=3;stamina=Math.min(staminaMax,stamina+45);updateStamina();updateWallet();});
+updateStamina();
+
+// A path of tiny lantern flowers
+for(let i=0;i<42;i++){const t=i/41,x=-15+t*240,z=25+Math.sin(t*6)*80,y=heightAt(x,z);const lightOrb=addMesh(new THREE.SphereGeometry(.38,8,8),new THREE.MeshStandardMaterial({color:0xffe6aa,emissive:0xffbd68,emissiveIntensity:1.7}),x,y+1.5,z);if(i%4===0){const l=new THREE.PointLight(0xffd38b,.55,14);l.position.copy(lightOrb.position);scene.add(l);}}
+
+// Controls
+let moveX=0,moveZ=0,vy=0,onGround=true,walk=0,yaw=0,pitch=.2;
+const joystick=document.querySelector('#joystick'),stick=document.querySelector('#stick');let joyId=null;
+joystick.addEventListener('pointerdown',e=>{joyId=e.pointerId;joystick.setPointerCapture(joyId);updateJoy(e);});
+joystick.addEventListener('pointermove',e=>{if(e.pointerId===joyId)updateJoy(e);});
+function updateJoy(e){const r=joystick.getBoundingClientRect(),dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2),d=Math.hypot(dx,dy),k=Math.min(1,d/43);moveX=dx/(d||1)*k;moveZ=dy/(d||1)*k;stick.style.transform=`translate(${moveX*34}px,${moveZ*34}px)`;}
+function endJoy(e){if(e.pointerId===joyId){joyId=null;moveX=moveZ=0;stick.style.transform='translate(0,0)';}}
+joystick.addEventListener('pointerup',endJoy);joystick.addEventListener('pointercancel',endJoy);
+document.querySelector('#jump').addEventListener('pointerdown',()=>{if(onGround&&stamina>=12){vy=12;onGround=false;stamina-=12;updateStamina();}});
+document.querySelector('#home').addEventListener('click',()=>{player.position.set(0,heightAt(0,0),0);yaw=0;});
+let cityUnlocked=false;try{cityUnlocked=localStorage.getItem('dreamIslandsCityUnlocked')==='1';}catch(e){}
+const cityBtn=document.querySelector('#cityBtn');
+function refreshCityButton(){cityBtn.textContent=cityUnlocked?'🛍️ 林口三井 Outlet 已解鎖':'🛍️ 解鎖林口三井 Outlet（20元）';cityBtn.disabled=cityUnlocked;}
+refreshCityButton();
+cityBtn.addEventListener('click',()=>{if(cityUnlocked)return;if(coins<20){cityBtn.textContent='還差 '+(20-coins)+' 元才能解鎖';setTimeout(refreshCityButton,1700);return;}coins-=20;cityUnlocked=true;try{localStorage.setItem('dreamIslandsCityUnlocked','1');localStorage.setItem('dreamIslandsCoins',String(coins));}catch(e){}updateWallet();refreshCityButton();});
+const destinations=[{x:0,z:0,name:'夢境草原・月光之境'},{x:-245,z:-235,name:'月霧花園'},{x:275,z:225,name:'水晶洞窟・礦脈入口'},{x:-255,z:235,name:'古代星門遺跡'},{x:275,z:-235,name:'雲海港灣'},{x:cliffX,z:cliffZ,name:'月亮瀑布・星光之門'},{x:-315,z:8,name:'琉璃燈籠小鎮'},{x:8,z:315,name:'櫻花月泉島'},{x:350,z:260,name:'星帆海岸村'},{x:-320,z:-315,name:'蘑菇祕境森林'},{x:80,z:-320,name:'風車雲丘'}];let destinationIndex=0;
+document.querySelector('#travel').addEventListener('click',()=>{const available=cityUnlocked?[...destinations,{x:mallX,z:front+10,name:'林口三井 Outlet・正門入口'}]:destinations;destinationIndex=(destinationIndex+1)%available.length;const d=available[destinationIndex];player.position.set(d.x,groundAt(d.x,d.z),d.z);vy=0;yaw=0;zone.textContent=d.name;});
+let dragging=false,lastX=0,lastY=0;
+renderer.domElement.addEventListener('pointerdown',e=>{if(e.clientX>145&&e.clientY<innerHeight-145){dragging=true;lastX=e.clientX;lastY=e.clientY;renderer.domElement.setPointerCapture(e.pointerId);}});
+renderer.domElement.addEventListener('pointermove',e=>{if(dragging){yaw-=(e.clientX-lastX)*.005;pitch=THREE.MathUtils.clamp(pitch+(e.clientY-lastY)*.003,-.15,.8);lastX=e.clientX;lastY=e.clientY;}});
+renderer.domElement.addEventListener('pointerup',()=>dragging=false);renderer.domElement.addEventListener('pointercancel',()=>dragging=false);
+addEventListener('keydown',e=>{if(e.key==='w'||e.key==='ArrowUp')moveZ=-1;if(e.key==='s'||e.key==='ArrowDown')moveZ=1;if(e.key==='a'||e.key==='ArrowLeft')moveX=-1;if(e.key==='d'||e.key==='ArrowRight')moveX=1;if(e.code==='Space'&&onGround){vy=12;onGround=false;}});
+addEventListener('keyup',e=>{if(['w','s','ArrowUp','ArrowDown'].includes(e.key))moveZ=0;if(['a','d','ArrowLeft','ArrowRight'].includes(e.key))moveX=0;});
+const zone=document.querySelector('#zone'),clock=new THREE.Clock(),worldClock=new THREE.Clock();
+function animate(){
+ requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.04);
+ const forward=new THREE.Vector3(-Math.sin(yaw),0,-Math.cos(yaw)),right=new THREE.Vector3(Math.cos(yaw),0,-Math.sin(yaw));
+ let activeX=player.position.x,activeZ=player.position.z,activeY=player.position.y;
+ if(!driving){
+  const dir=forward.clone().multiplyScalar(-moveZ).add(right.multiplyScalar(moveX));
+  if(dir.lengthSq()>.001&&stamina>0){dir.normalize();stamina=Math.max(0,stamina-dt*2.2);updateStamina();const nx=player.position.x+dir.x*dt*15,nz=player.position.z+dir.z*dt*15;let blocked=false;for(const b of blockers){const dx=nx-b.x,dz=nz-b.z,dist=Math.hypot(dx,dz),min=b.r+1.8;if(dist<min){if(b.kind==='tree'){breakTree(b,dx,dz);continue;}blocked=true;const push=(min-dist)/(dist||1);player.position.x+=dx*push;player.position.z+=dz*push;}}if(!blocked){player.position.x=nx;player.position.z=nz;}player.rotation.y=Math.atan2(dir.x,dir.z);walk+=dt*10;legL.rotation.x=Math.sin(walk)*.5;legR.rotation.x=-Math.sin(walk)*.5;}
+  if(moveX===0&&moveZ===0) {stamina=Math.min(staminaMax,stamina+dt*0.55);updateStamina();} const ground=groundAt(player.position.x,player.position.z);vy-=27*dt;player.position.y+=vy*dt;
+  if(player.position.y<ground){player.position.y=ground;vy=0;onGround=true;}
+  player.position.x=THREE.MathUtils.clamp(player.position.x,-365,625);player.position.z=THREE.MathUtils.clamp(player.position.z,-365,365);
+  activeX=player.position.x;activeZ=player.position.z;activeY=player.position.y;
+ }else{
+  carSpeed+=(throttle*24-brake*38)*dt;carSpeed*=Math.pow(.985,dt*60);carSpeed=THREE.MathUtils.clamp(carSpeed,-10,30);
+  car.rotation.y-=moveX*dt*(.75+Math.min(Math.abs(carSpeed)/18,.8))*(carSpeed<0?-1:1);
+  const nx=car.position.x-Math.sin(car.rotation.y)*carSpeed*dt,nz=car.position.z-Math.cos(car.rotation.y)*carSpeed*dt;
+  let blocked=false;for(const b of blockers){const dx=nx-b.x,dz=nz-b.z,dist=Math.hypot(dx,dz),min=b.r+3.2;if(dist<min){if(b.kind==='tree'){breakTree(b,dx,dz);carSpeed*=.72;continue;}blocked=true;carSpeed=0;}}
+  if(!blocked){car.position.x=THREE.MathUtils.clamp(nx,-365,625);car.position.z=THREE.MathUtils.clamp(nz,-365,365);}
+  car.position.y=groundAt(car.position.x,car.position.z);wheels.forEach(w=>w.rotation.x-=carSpeed*dt*1.5);
+  activeX=car.position.x;activeZ=car.position.z;activeY=car.position.y;
+ }
+ const x=activeX,z=activeZ;
+  const followYaw=driving?car.rotation.y:yaw;
+  const inMall=Math.abs(activeX-mallX)<49 && activeZ>mallZ-40 && activeZ<front-4;
+  const camDist=driving?19:(inMall?16:18);
+  const camHeight=driving?10:(inMall?8.5:9)+pitch*6;
+  const target=new THREE.Vector3(activeX+Math.sin(followYaw)*camDist,activeY+camHeight,activeZ+Math.cos(followYaw)*camDist);
+  if(inMall){
+   // Keep the follow camera on the same side of the mall walls as the player.
+   target.x=THREE.MathUtils.clamp(target.x,mallX-49,mallX+49);
+   target.z=THREE.MathUtils.clamp(target.z,mallZ-40,front+16);
+  }
+  camera.position.lerp(target,inMall?.18:.12);camera.lookAt(activeX,activeY+(driving?1.8:2.2),activeZ);
+ if(Math.hypot(x-cliffX,z-cliffZ)<75)zone.textContent='月亮瀑布・星光之門';
+ else if(Math.hypot(x+245,z+235)<85)zone.textContent='月霧花園';
+ else if(Math.hypot(x-275,z-225)<85)zone.textContent='水晶洞窟';
+ else if(Math.hypot(x+255,z-235)<85)zone.textContent='古代星門遺跡';
+ else if(Math.hypot(x-275,z+235)<85)zone.textContent='雲海港灣';
+ else if(Math.hypot(x-cityX,z-cityZ)<112)zone.textContent='林口三井 Outlet';
+ else zone.textContent='夢境草原・月光之境';
+ // Fallen trees regrow after a short rest, restoring their collision too.
+ for(let i=treeRespawns.length-1;i>=0;i--){const t=treeRespawns[i];t.timer-=dt;if(t.timer<=0){t.tree.rotation.set(0,0,0);t.tree.visible=true;blockers.push({x:t.x,z:t.z,r:t.r,kind:'tree',object:t.tree,broken:false});treeRespawns.splice(i,1);}}
+ // Crystal nodes slowly regenerate after mining.
+ mineNodes.forEach(n=>{if(!n.available){n.respawn-=dt;if(n.respawn<=0){n.available=true;n.group.visible=true;}}else{n.group.children.forEach((c,i)=>{if(c.isMesh)c.rotation.y+=dt*(.35+i*.08);});}});
+ updateWallet();
+ // Animate fallen trees and their little leaf/wood fragments.
+ fallingTrees.forEach(f=>{f.age+=dt;const k=1-Math.pow(1-Math.min(f.age/1.05,1),3);f.tree.rotation.x=THREE.MathUtils.lerp(f.fromX,f.toX,k);f.tree.rotation.z=THREE.MathUtils.lerp(f.fromZ,f.toZ,k);});
+ for(let i=treeDebris.length-1;i>=0;i--){const d=treeDebris[i];d.life-=dt;d.vy-=15*dt;d.mesh.position.x+=d.vx*dt;d.mesh.position.y+=d.vy*dt;d.mesh.position.z+=d.vz*dt;d.mesh.rotation.x+=dt*4;d.mesh.rotation.z+=dt*3;if(d.life<=0){scene.remove(d.mesh);d.mesh.geometry.dispose();treeDebris.splice(i,1);}}
+ // Local atmosphere animation: slow fog drift, gentle butterfly wingbeats and cave motes.
+ gardenFog.children.forEach((o,i)=>{if(o.userData.baseY!==undefined){o.position.x+=Math.sin(worldClock.elapsedTime*.18+i)*dt*.7;o.position.y=o.userData.baseY+Math.sin(worldClock.elapsedTime*.45+i)*.45;}});
+ butterflies.forEach((b,i)=>{const u=b.userData;b.position.x=u.origin.x+Math.sin(worldClock.elapsedTime*.42+u.phase)*5;b.position.y=u.origin.y+Math.sin(worldClock.elapsedTime*.9+u.phase)*1.8;b.position.z=u.origin.z+Math.cos(worldClock.elapsedTime*.35+u.phase)*4;u.left.rotation.z=Math.sin(worldClock.elapsedTime*11+u.phase)*.65;u.right.rotation.z=-Math.sin(worldClock.elapsedTime*11+u.phase)*.65;});
+ caveDust.forEach((m,i)=>{m.position.y=caveY+4+((worldClock.elapsedTime*1.2+i*2.3)%20);m.position.x+=Math.sin(worldClock.elapsedTime*.4+i)*dt*.22;});
+ const inGarden=Math.hypot(x+245,z+235)<92,inCave=Math.hypot(x-275,z-225)<72,inHarbor=Math.hypot(x-275,z+235)<110;
+ setAmbienceScene(x,z);
+ gardenGlow.intensity=inGarden?1.65:.25;caveShade.intensity=inCave?.95:.18;
+ scene.fog.density=inCave?.0022:(inGarden?.00155:(inHarbor?.00095:.00072));
+ harborRipples.forEach((r,i)=>{r.scale.x=1.2+Math.sin(worldClock.elapsedTime*.8+r.userData.phase)*.18;r.material.opacity=.15+Math.max(0,Math.sin(worldClock.elapsedTime*1.2+r.userData.phase))*.16;});
+ cloudSea.children.forEach((g,i)=>{g.position.x+=Math.sin(worldClock.elapsedTime*.08+g.userData.phase)*dt*.7;g.position.z+=Math.cos(worldClock.elapsedTime*.07+g.userData.phase)*dt*.45;});
+ harborFireflies.forEach((f)=>{f.position.y=f.userData.baseY+Math.sin(worldClock.elapsedTime*1.4+f.userData.phase)*1.2;f.material.opacity=.25+.65*(.5+.5*Math.sin(worldClock.elapsedTime*2+f.userData.phase));});
+ stars.rotation.y+=dt*.0008;falls.forEach((f,i)=>{const a=f.geometry.attributes.position;for(let k=0;k<a.count;k++){const x=a.getX(k),y=a.getY(k),z=a.getZ(k);a.setX(k,x+Math.sin(worldClock.elapsedTime*2.2+y*.22+i)*.018);a.setZ(k,z+Math.sin(worldClock.elapsedTime*2.8+y*.3+i)*.025);}a.needsUpdate=true;});let nearestKeeper=null,nearestDist=1e9;if(!driving){for(const k of shopkeepers){const d=Math.hypot(player.position.x-k.x,player.position.z-k.z);if(d<nearestDist){nearestDist=d;nearestKeeper=k;}}}const nearClerk=nearestKeeper&&nearestDist<13;npcBuy.style.display=nearClerk?'block':'none';if(nearClerk){activeShop=nearestKeeper.type;activeShopTitle=nearestKeeper.title;npcBuy.textContent='🛍️ '+nearestKeeper.label+'｜購買';}renderer.render(scene,camera);
+}
+animate();document.querySelector('#loading').style.display='none';
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
+</script>
+</body></html>
