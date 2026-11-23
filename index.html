@@ -66,7 +66,22 @@
 <div id="furniturePanel"><button data-furniture="chair">🪑 木椅</button><button data-furniture="table">🪵 小桌</button><button data-furniture="sofa">🛋️ 沙發</button><button data-furniture="bed">🛏️ 床</button><button data-furniture="lamp">🏮 庭院燈</button><button data-furniture="plant">🪴 盆栽</button><button data-furniture="woodblock">🧱 木建材</button></div>
 <div id="zone">夢境草原・月光之境</div><button id="musicBtn">🎵 選擇音樂</button><button id="ambienceBtn">🌬️ 環境音：關</button><input id="musicFile" type="file" accept="audio/*">
 <script type="module">
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+let THREE;
+try {
+  THREE = await import('https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js');
+} catch (firstError) {
+  try {
+    THREE = await import('https://unpkg.com/three@0.160.0/build/three.module.js');
+  } catch (secondError) {
+    const loading = document.querySelector('#loading');
+    if (loading) {
+      loading.textContent = '遊戲素材載入失敗，請確認網路連線後重新整理。';
+      loading.style.padding = '24px';
+      loading.style.textAlign = 'center';
+    }
+    throw secondError;
+  }
+}
 const mount=document.querySelector('#game'),scene=new THREE.Scene();
 scene.background=new THREE.Color(0x171b43);
 scene.fog=new THREE.FogExp2(0x30365f,.00072);
